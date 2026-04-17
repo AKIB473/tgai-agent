@@ -99,7 +99,7 @@ async def test_chat_config_defaults():
     config = await get_chat_config(11111, 22222)
     assert config["ai_provider"] == "openai"
     assert config["ai_model"] == "gpt-4o-mini"
-    assert config["auto_reply"] == False
+    assert not config["auto_reply"]
     assert config["tone"] == "neutral"
 
 
