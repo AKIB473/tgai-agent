@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import uuid
+
 from tgai_agent.storage.database import get_db
 from tgai_agent.utils.helpers import utcnow
 from tgai_agent.utils.logger import get_logger

@@ -8,7 +8,6 @@ user key is configured.
 
 from __future__ import annotations
 
-
 from tgai_agent.ai_core.base_provider import AIMessage, BaseAIProvider
 from tgai_agent.ai_core.providers.claude_provider import ClaudeProvider
 from tgai_agent.ai_core.providers.gemini_provider import GeminiProvider
