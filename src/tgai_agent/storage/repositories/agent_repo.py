@@ -51,10 +51,13 @@ async def get_agent(agent_id: str) -> dict | None:
 
 
 async def list_agents(user_id: int) -> list[dict]:
-    async with get_db() as db, db.execute(
-        "SELECT * FROM agents WHERE user_id = ? ORDER BY created_at DESC",
-        (user_id,),
-    ) as cursor:
+    async with (
+        get_db() as db,
+        db.execute(
+            "SELECT * FROM agents WHERE user_id = ? ORDER BY created_at DESC",
+            (user_id,),
+        ) as cursor,
+    ):
         rows = await cursor.fetchall()
         result = []
         for row in rows:

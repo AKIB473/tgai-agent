@@ -35,10 +35,13 @@ async def save_api_key(user_id: int, provider: str, api_key: str) -> None:
 
 async def get_api_key(user_id: int, provider: str) -> str:
     """Return the decrypted API key, or empty string if not set."""
-    async with get_db() as db, db.execute(
-        "SELECT key_encrypted FROM api_keys WHERE user_id = ? AND provider = ?",
-        (user_id, provider),
-    ) as cursor:
+    async with (
+        get_db() as db,
+        db.execute(
+            "SELECT key_encrypted FROM api_keys WHERE user_id = ? AND provider = ?",
+            (user_id, provider),
+        ) as cursor,
+    ):
         row = await cursor.fetchone()
         return decrypt(row["key_encrypted"]) if row else ""
 
@@ -57,10 +60,13 @@ DEFAULT_CHAT_CONFIG = {
 
 
 async def get_chat_config(user_id: int, chat_id: int) -> dict:
-    async with get_db() as db, db.execute(
-        "SELECT * FROM chat_configs WHERE user_id = ? AND chat_id = ?",
-        (user_id, chat_id),
-    ) as cursor:
+    async with (
+        get_db() as db,
+        db.execute(
+            "SELECT * FROM chat_configs WHERE user_id = ? AND chat_id = ?",
+            (user_id, chat_id),
+        ) as cursor,
+    ):
         row = await cursor.fetchone()
         if row:
             return dict(row)
@@ -131,15 +137,18 @@ async def get_messages(
     limit: int = 50,
 ) -> list[dict]:
     """Return recent messages in chronological order (oldest first)."""
-    async with get_db() as db, db.execute(
-        """
+    async with (
+        get_db() as db,
+        db.execute(
+            """
             SELECT role, content FROM messages
             WHERE user_id = ? AND chat_id = ?
             ORDER BY created_at DESC
             LIMIT ?
             """,
-        (user_id, chat_id, limit),
-    ) as cursor:
+            (user_id, chat_id, limit),
+        ) as cursor,
+    ):
         rows = await cursor.fetchall()
         return [dict(r) for r in reversed(rows)]
 

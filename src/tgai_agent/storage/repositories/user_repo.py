@@ -58,7 +58,8 @@ async def ban_user(user_id: int) -> None:
 
 
 async def list_users(limit: int = 100) -> list[dict]:
-    async with get_db() as db, db.execute(
-        "SELECT * FROM users ORDER BY created_at DESC LIMIT ?", (limit,)
-    ) as cursor:
+    async with (
+        get_db() as db,
+        db.execute("SELECT * FROM users ORDER BY created_at DESC LIMIT ?", (limit,)) as cursor,
+    ):
         return [dict(r) for r in await cursor.fetchall()]

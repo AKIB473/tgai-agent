@@ -31,10 +31,13 @@ async def test_get_provider_no_key_raises():
     orig = os.environ.get("OPENAI_API_KEY", "")
     os.environ["OPENAI_API_KEY"] = ""
     # Patch DB key lookup to return empty
-    with patch(
-        "tgai_agent.ai_core.router.get_api_key",
-        new=AsyncMock(return_value=""),
-    ), pytest.raises(ValueError, match="No API key"):
+    with (
+        patch(
+            "tgai_agent.ai_core.router.get_api_key",
+            new=AsyncMock(return_value=""),
+        ),
+        pytest.raises(ValueError, match="No API key"),
+    ):
         await get_provider(user_id=1, provider_name="openai")
     os.environ["OPENAI_API_KEY"] = orig
 
