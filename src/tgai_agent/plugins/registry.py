@@ -10,7 +10,6 @@ from __future__ import annotations
 import importlib
 import pkgutil
 import time
-from typing import Dict, Optional
 
 from tgai_agent.plugins.base_plugin import BasePlugin, PluginError
 from tgai_agent.storage.database import get_db

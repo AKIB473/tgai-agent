@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import os
 from functools import lru_cache
-from typing import List
 
 from dotenv import load_dotenv
 from pydantic import Field, field_validator
