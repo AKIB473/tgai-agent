@@ -4,8 +4,9 @@ plugins/builtin/summarizer.py — Summarise any URL using AI.
 
 from __future__ import annotations
 
-import httpx
 from html.parser import HTMLParser
+
+import httpx
 
 from tgai_agent.ai_core.base_provider import AIMessage
 from tgai_agent.ai_core.router import complete
@@ -20,6 +21,7 @@ log = get_logger(__name__)
 
 class _TextExtractor(HTMLParser):
     """Minimal HTML → plain text extractor."""
+
     def __init__(self):
         super().__init__()
         self._parts: list[str] = []

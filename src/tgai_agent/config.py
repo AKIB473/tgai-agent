@@ -29,7 +29,7 @@ class Settings(BaseSettings):
 
     # ── Security ─────────────────────────────────────────────────────────
     encryption_key: str = Field(..., env="ENCRYPTION_KEY")
-    admin_ids: List[int] = Field(default_factory=list, env="ADMIN_IDS")
+    admin_ids: list[int] = Field(default_factory=list, env="ADMIN_IDS")
 
     # ── AI Providers (system defaults) ───────────────────────────────────
     openai_api_key: str = Field("", env="OPENAI_API_KEY")

@@ -6,13 +6,13 @@ from __future__ import annotations
 
 import hashlib
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from typing import Any
 
 
 def utcnow() -> datetime:
     """Return a timezone-aware UTC datetime."""
-    return datetime.now(tz=timezone.utc)
+    return datetime.now(tz=UTC)
 
 
 def truncate(text: str, max_len: int = 4000) -> str:

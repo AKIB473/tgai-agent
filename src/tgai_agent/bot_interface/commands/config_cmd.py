@@ -15,7 +15,11 @@ from telegram.ext import (
 
 from tgai_agent.bot_interface.menus.keyboards import config_menu
 from tgai_agent.security.permissions import require_permission
-from tgai_agent.storage.repositories.chat_repo import get_chat_config, save_api_key, upsert_chat_config
+from tgai_agent.storage.repositories.chat_repo import (
+    get_chat_config,
+    save_api_key,
+    upsert_chat_config,
+)
 from tgai_agent.utils.logger import get_logger
 
 log = get_logger(__name__)

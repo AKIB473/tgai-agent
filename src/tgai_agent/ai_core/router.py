@@ -11,9 +11,9 @@ from __future__ import annotations
 from typing import Dict, Type
 
 from tgai_agent.ai_core.base_provider import AIMessage, BaseAIProvider
-from tgai_agent.ai_core.providers.openai_provider import OpenAIProvider
-from tgai_agent.ai_core.providers.gemini_provider import GeminiProvider
 from tgai_agent.ai_core.providers.claude_provider import ClaudeProvider
+from tgai_agent.ai_core.providers.gemini_provider import GeminiProvider
+from tgai_agent.ai_core.providers.openai_provider import OpenAIProvider
 from tgai_agent.config import settings
 from tgai_agent.storage.repositories.chat_repo import get_api_key
 from tgai_agent.utils.logger import get_logger
@@ -21,14 +21,14 @@ from tgai_agent.utils.logger import get_logger
 log = get_logger(__name__)
 
 # Registry: provider name → class
-_PROVIDER_REGISTRY: Dict[str, Type[BaseAIProvider]] = {
+_PROVIDER_REGISTRY: dict[str, type[BaseAIProvider]] = {
     OpenAIProvider.name: OpenAIProvider,
     GeminiProvider.name: GeminiProvider,
     ClaudeProvider.name: ClaudeProvider,
 }
 
 # System-level fallback keys from .env
-_SYSTEM_KEYS: Dict[str, str] = {
+_SYSTEM_KEYS: dict[str, str] = {
     "openai": settings.openai_api_key,
     "gemini": settings.gemini_api_key,
     "claude": settings.claude_api_key,
@@ -55,8 +55,7 @@ async def get_provider(
     cls = _PROVIDER_REGISTRY.get(provider_name)
     if cls is None:
         raise ValueError(
-            f"Unknown provider '{provider_name}'. "
-            f"Available: {list(_PROVIDER_REGISTRY.keys())}"
+            f"Unknown provider '{provider_name}'. " f"Available: {list(_PROVIDER_REGISTRY.keys())}"
         )
 
     api_key = await get_api_key(user_id, provider_name)
@@ -64,8 +63,7 @@ async def get_provider(
         api_key = _SYSTEM_KEYS.get(provider_name, "")
     if not api_key:
         raise ValueError(
-            f"No API key available for provider '{provider_name}'. "
-            f"Use /config to add your key."
+            f"No API key available for provider '{provider_name}'. " f"Use /config to add your key."
         )
 
     log.debug("ai_router.resolved", provider=provider_name, model=model)

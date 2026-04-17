@@ -18,7 +18,7 @@ import asyncio
 from typing import Any
 
 from RestrictedPython import compile_restricted, safe_globals
-from RestrictedPython.Guards import safe_builtins, guarded_iter_unpack_sequence
+from RestrictedPython.Guards import guarded_iter_unpack_sequence, safe_builtins
 from RestrictedPython.PrintCollector import PrintCollector  # noqa: F401
 
 from tgai_agent.plugins.base_plugin import BasePlugin, PluginError
@@ -34,13 +34,50 @@ MAX_OUTPUT_CHARS = 2000
 _ALLOWED_BUILTINS: dict = {
     k: safe_builtins[k]
     for k in (
-        "abs", "all", "any", "bin", "bool", "chr", "dict", "divmod",
-        "enumerate", "filter", "float", "format", "frozenset", "getattr",
-        "hasattr", "hash", "hex", "int", "isinstance", "issubclass",
-        "iter", "len", "list", "map", "max", "min", "next", "oct",
-        "ord", "pow", "print", "range", "repr", "reversed", "round",
-        "set", "setattr", "slice", "sorted", "str", "sum", "tuple",
-        "type", "zip",
+        "abs",
+        "all",
+        "any",
+        "bin",
+        "bool",
+        "chr",
+        "dict",
+        "divmod",
+        "enumerate",
+        "filter",
+        "float",
+        "format",
+        "frozenset",
+        "getattr",
+        "hasattr",
+        "hash",
+        "hex",
+        "int",
+        "isinstance",
+        "issubclass",
+        "iter",
+        "len",
+        "list",
+        "map",
+        "max",
+        "min",
+        "next",
+        "oct",
+        "ord",
+        "pow",
+        "print",
+        "range",
+        "repr",
+        "reversed",
+        "round",
+        "set",
+        "setattr",
+        "slice",
+        "sorted",
+        "str",
+        "sum",
+        "tuple",
+        "type",
+        "zip",
     )
     if k in safe_builtins
 }
@@ -118,7 +155,7 @@ class CodeRunnerPlugin(BasePlugin):
                 asyncio.get_event_loop().run_in_executor(None, _run_code_sync, code),
                 timeout=TIMEOUT_SECONDS,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise PluginError(f"Code execution timed out after {TIMEOUT_SECONDS}s.")
 
         return f"```\n{result}\n```"

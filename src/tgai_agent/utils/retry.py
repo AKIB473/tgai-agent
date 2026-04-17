@@ -11,7 +11,8 @@ from __future__ import annotations
 
 import asyncio
 import functools
-from typing import Callable, Tuple, Type
+from collections.abc import Callable
+from typing import Tuple, Type
 
 from tgai_agent.utils.logger import get_logger
 
@@ -23,7 +24,7 @@ def async_retry(
     wait_seconds: float = 1.0,
     wait_max: float = 30.0,
     reraise: bool = True,
-    exceptions: Tuple[Type[Exception], ...] = (Exception,),
+    exceptions: tuple[type[Exception], ...] = (Exception,),
 ) -> Callable:
     """
     Decorator that retries an async function with exponential back-off.

@@ -30,7 +30,7 @@ class GeminiProvider(BaseAIProvider):
     @async_retry(max_attempts=3, wait_seconds=2, exceptions=(Exception,))
     async def complete(
         self,
-        messages: List[AIMessage],
+        messages: list[AIMessage],
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,
@@ -44,7 +44,9 @@ class GeminiProvider(BaseAIProvider):
         if system_parts:
             system_text = "\n\n".join(system_parts)
             history.append({"role": "user", "parts": [f"[Instructions]\n{system_text}"]})
-            history.append({"role": "model", "parts": ["Understood. I will follow these instructions."]})
+            history.append(
+                {"role": "model", "parts": ["Understood. I will follow these instructions."]}
+            )
 
         for msg in user_msgs[:-1]:
             role = "model" if msg.role == "assistant" else "user"

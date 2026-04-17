@@ -1,6 +1,7 @@
 """Tests for utility helpers."""
 
 import pytest
+
 from tgai_agent.utils.helpers import (
     chunk_list,
     flatten,
@@ -32,12 +33,15 @@ def test_flatten():
     assert flatten([[1, 2], [3, 4], [5]]) == [1, 2, 3, 4, 5]
 
 
-@pytest.mark.parametrize("text,expected", [
-    ("5s", 5),
-    ("3m", 180),
-    ("2h", 7200),
-    ("1d", 86400),
-])
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("5s", 5),
+        ("3m", 180),
+        ("2h", 7200),
+        ("1d", 86400),
+    ],
+)
 def test_parse_duration(text, expected):
     assert parse_duration(text) == expected
 

@@ -1,4 +1,5 @@
 """Tests for ShortTermMemory and LongTermMemory."""
+
 import pytest
 
 
@@ -7,11 +8,13 @@ def use_temp_db(tmp_path, monkeypatch):
     db_path = str(tmp_path / "test.db")
     monkeypatch.setenv("DB_PATH", db_path)
     from tgai_agent.config import get_settings
+
     get_settings.cache_clear()
     new_settings = get_settings()
     import tgai_agent.config as cfg
     import tgai_agent.storage.database as db_mod
     import tgai_agent.storage.encryption as enc_mod
+
     monkeypatch.setattr(cfg, "settings", new_settings)
     monkeypatch.setattr(db_mod, "settings", new_settings)
     monkeypatch.setattr(enc_mod, "settings", new_settings)
@@ -21,9 +24,10 @@ def use_temp_db(tmp_path, monkeypatch):
 
 @pytest.mark.asyncio
 async def test_short_term_add_and_get():
+    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
     from tgai_agent.storage.database import init_db
     from tgai_agent.storage.repositories.user_repo import upsert_user
-    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+
     await init_db()
     await upsert_user(1)
     mem = ShortTermMemory(user_id=1, chat_id=100)
@@ -39,9 +43,10 @@ async def test_short_term_add_and_get():
 
 @pytest.mark.asyncio
 async def test_short_term_with_system_prompt():
+    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
     from tgai_agent.storage.database import init_db
     from tgai_agent.storage.repositories.user_repo import upsert_user
-    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+
     await init_db()
     await upsert_user(2)
     mem = ShortTermMemory(user_id=2, chat_id=200)
@@ -55,9 +60,10 @@ async def test_short_term_with_system_prompt():
 
 @pytest.mark.asyncio
 async def test_short_term_clear():
+    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
     from tgai_agent.storage.database import init_db
     from tgai_agent.storage.repositories.user_repo import upsert_user
-    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+
     await init_db()
     await upsert_user(3)
     mem = ShortTermMemory(user_id=3, chat_id=300)
@@ -71,9 +77,10 @@ async def test_short_term_clear():
 
 @pytest.mark.asyncio
 async def test_short_term_window_limit():
+    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
     from tgai_agent.storage.database import init_db
     from tgai_agent.storage.repositories.user_repo import upsert_user
-    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+
     await init_db()
     await upsert_user(4)
     mem = ShortTermMemory(user_id=4, chat_id=400, window=3)
@@ -86,9 +93,10 @@ async def test_short_term_window_limit():
 
 @pytest.mark.asyncio
 async def test_short_term_summary():
+    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
     from tgai_agent.storage.database import init_db
     from tgai_agent.storage.repositories.user_repo import upsert_user
-    from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+
     await init_db()
     await upsert_user(5)
     mem = ShortTermMemory(user_id=5, chat_id=500)
@@ -100,8 +108,9 @@ async def test_short_term_summary():
 
 @pytest.mark.asyncio
 async def test_short_term_empty_memory():
-    from tgai_agent.storage.database import init_db
     from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+    from tgai_agent.storage.database import init_db
+
     await init_db()
     mem = ShortTermMemory(user_id=6, chat_id=600)
     messages = await mem.get_context()
@@ -110,15 +119,17 @@ async def test_short_term_empty_memory():
 
 @pytest.mark.asyncio
 async def test_short_term_max_window_cap():
-    from tgai_agent.ai_core.memory.short_term import ShortTermMemory, MAX_WINDOW
+    from tgai_agent.ai_core.memory.short_term import MAX_WINDOW, ShortTermMemory
+
     mem = ShortTermMemory(user_id=7, chat_id=700, window=9999)
     assert mem.window == MAX_WINDOW
 
 
 @pytest.mark.asyncio
 async def test_long_term_no_compress_below_threshold():
-    from tgai_agent.storage.database import init_db
     from tgai_agent.ai_core.memory.long_term import LongTermMemory
+    from tgai_agent.storage.database import init_db
+
     await init_db()
     lt = LongTermMemory(user_id=10, chat_id=1000)
     result = await lt.maybe_compress()

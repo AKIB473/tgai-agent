@@ -20,13 +20,13 @@ from tgai_agent.utils.logger import get_logger
 log = get_logger(__name__)
 
 # Global storage: user_id → deque of timestamps
-_request_windows: Dict[int, Deque[float]] = defaultdict(deque)
-_chat_windows: Dict[tuple, Deque[float]] = defaultdict(deque)
+_request_windows: dict[int, deque[float]] = defaultdict(deque)
+_chat_windows: dict[tuple, deque[float]] = defaultdict(deque)
 
 _lock = asyncio.Lock()
 
 
-def _clean_window(window: Deque[float], now: float, period: float) -> None:
+def _clean_window(window: deque[float], now: float, period: float) -> None:
     """Remove timestamps older than `period` seconds."""
     while window and window[0] < now - period:
         window.popleft()

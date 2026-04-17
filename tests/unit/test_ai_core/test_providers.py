@@ -1,10 +1,12 @@
 """Tests for AI providers with mocked API clients."""
-import pytest
+
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from tgai_agent.ai_core.base_provider import AIMessage
-from tgai_agent.ai_core.providers.openai_provider import OpenAIProvider
 from tgai_agent.ai_core.providers.claude_provider import ClaudeProvider
+from tgai_agent.ai_core.providers.openai_provider import OpenAIProvider
 
 
 class TestOpenAIProvider:
@@ -105,19 +107,22 @@ class TestOpenAIProvider:
 
 class TestGeminiProvider:
     def test_init(self):
-        with patch("google.generativeai.configure"), \
-             patch("google.generativeai.GenerativeModel"):
+        with patch("google.generativeai.configure"), patch("google.generativeai.GenerativeModel"):
             from tgai_agent.ai_core.providers.gemini_provider import GeminiProvider
+
             p = GeminiProvider(api_key="test-key")
             assert p.api_key == "test-key"
             assert p.name == "gemini"
 
     @pytest.mark.asyncio
     async def test_complete_returns_string(self):
-        with patch("google.generativeai.configure"), \
-             patch("google.generativeai.GenerativeModel") as mock_model_cls, \
-             patch("google.generativeai.GenerationConfig"):
+        with (
+            patch("google.generativeai.configure"),
+            patch("google.generativeai.GenerativeModel") as mock_model_cls,
+            patch("google.generativeai.GenerationConfig"),
+        ):
             from tgai_agent.ai_core.providers.gemini_provider import GeminiProvider
+
             mock_model = MagicMock()
             mock_chat = MagicMock()
             mock_resp = MagicMock()
@@ -136,10 +141,13 @@ class TestGeminiProvider:
 
     @pytest.mark.asyncio
     async def test_system_message_becomes_leading_exchange(self):
-        with patch("google.generativeai.configure"), \
-             patch("google.generativeai.GenerativeModel") as mock_model_cls, \
-             patch("google.generativeai.GenerationConfig"):
+        with (
+            patch("google.generativeai.configure"),
+            patch("google.generativeai.GenerativeModel") as mock_model_cls,
+            patch("google.generativeai.GenerationConfig"),
+        ):
             from tgai_agent.ai_core.providers.gemini_provider import GeminiProvider
+
             mock_model = MagicMock()
             mock_chat = MagicMock()
             mock_resp = MagicMock()

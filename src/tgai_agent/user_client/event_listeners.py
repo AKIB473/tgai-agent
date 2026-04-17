@@ -94,6 +94,7 @@ async def _handle_incoming(event) -> None:
         # Send the reply via Telethon (typing simulation for realism)
         async with event.client.action(chat_id, "typing"):
             import asyncio
+
             # Brief realistic delay (0.5–1.5s based on response length)
             delay = min(0.5 + len(response) / 800, 1.5)
             await asyncio.sleep(delay)

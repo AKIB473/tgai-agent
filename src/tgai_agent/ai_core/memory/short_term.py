@@ -19,7 +19,7 @@ from tgai_agent.utils.logger import get_logger
 
 log = get_logger(__name__)
 
-DEFAULT_WINDOW = 20   # messages to keep in context
+DEFAULT_WINDOW = 20  # messages to keep in context
 MAX_WINDOW = 100
 
 
@@ -41,12 +41,12 @@ class ShortTermMemory:
     async def get_context(
         self,
         system_prompt: str = "",
-    ) -> List[AIMessage]:
+    ) -> list[AIMessage]:
         """
         Return a list of AIMessage objects ready for the provider.
         System prompt is always first; followed by the last `window` messages.
         """
-        messages: List[AIMessage] = []
+        messages: list[AIMessage] = []
 
         if system_prompt:
             messages.append(AIMessage("system", system_prompt))

@@ -10,8 +10,9 @@ Tests:
 
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 
 def _make_update(user_id: int, chat_id: int, text: str = "Hello"):
@@ -234,7 +235,11 @@ class TestAgentTalkMode:
         # Should send a goodbye message
         update.message.reply_text.assert_called_once()
         reply_text = update.message.reply_text.call_args[0][0]
-        assert "stop" in reply_text.lower() or "normal" in reply_text.lower() or "agent" in reply_text.lower()
+        assert (
+            "stop" in reply_text.lower()
+            or "normal" in reply_text.lower()
+            or "agent" in reply_text.lower()
+        )
         # Should NOT have called talk_to_agent for the /done message
         mock_talk.assert_not_called()
 

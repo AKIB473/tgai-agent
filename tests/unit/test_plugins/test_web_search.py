@@ -1,6 +1,8 @@
 """Tests for WebSearchPlugin."""
-import pytest
+
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from tgai_agent.plugins.base_plugin import PluginError
 from tgai_agent.plugins.builtin.web_search import WebSearchPlugin
@@ -99,8 +101,12 @@ async def test_web_search_related_topics(plugin, context):
 @pytest.mark.asyncio
 async def test_web_search_empty_results(plugin, context):
     mock_data = {
-        "Answer": "", "AbstractText": "", "AbstractSource": "",
-        "RelatedTopics": [], "Results": [], "Definition": "",
+        "Answer": "",
+        "AbstractText": "",
+        "AbstractSource": "",
+        "RelatedTopics": [],
+        "Results": [],
+        "Definition": "",
     }
     mock_resp = MagicMock()
     mock_resp.json.return_value = mock_data
@@ -136,8 +142,7 @@ async def test_web_search_max_results_respected(plugin, context):
         "AbstractText": "",
         "AbstractSource": "",
         "RelatedTopics": [
-            {"Text": f"Topic {i}", "FirstURL": f"https://example.com/{i}"}
-            for i in range(20)
+            {"Text": f"Topic {i}", "FirstURL": f"https://example.com/{i}"} for i in range(20)
         ],
         "Results": [],
         "Definition": "",
@@ -160,6 +165,7 @@ async def test_web_search_max_results_respected(plugin, context):
 @pytest.mark.asyncio
 async def test_web_search_http_error_raises(plugin, context):
     import httpx
+
     with patch("httpx.AsyncClient") as mock_cls:
         mock_client = AsyncMock()
         mock_client.get = AsyncMock(side_effect=httpx.HTTPError("Connection failed"))

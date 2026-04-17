@@ -14,11 +14,11 @@ from __future__ import annotations
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from tgai_agent.agent_manager.manager import talk_to_agent
 from tgai_agent.ai_core.base_provider import AIMessage
 from tgai_agent.ai_core.memory.long_term import LongTermMemory
 from tgai_agent.ai_core.memory.short_term import ShortTermMemory
 from tgai_agent.ai_core.router import complete
-from tgai_agent.agent_manager.manager import talk_to_agent
 from tgai_agent.bot_interface.menus.keyboards import auto_reply_prompt_menu
 from tgai_agent.security.permissions import require_permission
 from tgai_agent.security.rate_guard import is_rate_limited
@@ -48,9 +48,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # ── 2. Rate limit ────────────────────────────────────────────────────
     if await is_rate_limited(user.id, chat.id):
-        await message.reply_text(
-            "⚠️ You're sending messages too fast. Please wait a moment."
-        )
+        await message.reply_text("⚠️ You're sending messages too fast. Please wait a moment.")
         return
 
     # ── Agent talk mode ──────────────────────────────────────────────────
@@ -76,13 +74,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Check if we already asked for permission for this chat
         if not config.get("reply_confirmed"):
             await upsert_chat_config(
-                user.id, chat.id,
+                user.id,
+                chat.id,
                 chat_title=chat.title or chat.first_name or str(chat.id),
                 reply_confirmed=True,  # mark as asked so we don't spam
             )
             await message.reply_text(
-                f"👋 Hi! I noticed a message in this chat.\n"
-                f"Would you like me to auto-reply here?",
+                "👋 Hi! I noticed a message in this chat.\n"
+                "Would you like me to auto-reply here?",
                 reply_markup=auto_reply_prompt_menu(chat.id),
             )
         # Don't reply until user explicitly enables it

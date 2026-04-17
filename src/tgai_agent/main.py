@@ -27,15 +27,18 @@ async def main() -> None:
     configure_logging(settings.log_level)
     # ── 1. Database ──────────────────────────────────────────────────────
     from tgai_agent.storage.database import init_db
+
     await init_db()
 
     # ── 2. Plugins ───────────────────────────────────────────────────────
     from tgai_agent.plugins.registry import PluginRegistry
+
     PluginRegistry.autodiscover()
     log.info("startup.plugins", count=len(PluginRegistry.list_all()))
 
     # ── 3. Bot ───────────────────────────────────────────────────────────
     from tgai_agent.bot_interface.bot import build_application
+
     app = build_application()
     await app.initialize()
     await app.start()
@@ -43,6 +46,7 @@ async def main() -> None:
 
     # ── 4. Scheduler ─────────────────────────────────────────────────────
     from tgai_agent.task_scheduler.scheduler import scheduler
+
     scheduler.set_bot(app)
     scheduler.start()
     # Note: To load tasks for specific users, call scheduler.load_from_db([user_id])
@@ -56,6 +60,7 @@ async def main() -> None:
         try:
             from tgai_agent.user_client.client import get_client
             from tgai_agent.user_client.event_listeners import register_listeners
+
             telethon_client = await get_client()
 
             # Resolve the owner's Telegram user ID
@@ -89,10 +94,12 @@ async def main() -> None:
 async def _shutdown(app, telethon_client) -> None:
     log.info("shutdown.starting")
     from tgai_agent.task_scheduler.scheduler import scheduler
+
     scheduler.stop()
 
     if telethon_client:
         from tgai_agent.user_client.client import disconnect_client
+
         await disconnect_client()
 
     await app.updater.stop()
@@ -103,11 +110,14 @@ async def _shutdown(app, telethon_client) -> None:
 
 def init_db_only() -> None:
     """CLI: python main.py --init-db"""
+
     async def _run():
         configure_logging(settings.log_level)
         from tgai_agent.storage.database import init_db
+
         await init_db()
         print("✅ Database initialised.")
+
     asyncio.run(_run())
 
 

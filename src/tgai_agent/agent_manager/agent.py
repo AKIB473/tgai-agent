@@ -55,7 +55,9 @@ class SubAgent:
         self.state = AgentState.IDLE
 
         # Use chat_id = -1 as a namespace for this agent's personal memory
-        self._memory = ShortTermMemory(user_id, chat_id=-int(agent_id.replace("-", "")[:8], 16) % (2**31))
+        self._memory = ShortTermMemory(
+            user_id, chat_id=-int(agent_id.replace("-", "")[:8], 16) % (2**31)
+        )
         self._task: asyncio.Task | None = None
 
     async def think(self, user_message: str) -> str:
@@ -96,8 +98,7 @@ class SubAgent:
         try:
             # Build task prompt with available tool descriptions
             available_tools = "\n".join(
-                f"- {p.name}: {p.description}"
-                for p in PluginRegistry.list_all()
+                f"- {p.name}: {p.description}" for p in PluginRegistry.list_all()
             )
             task_prompt = (
                 f"Your task: {task_description}\n\n"
@@ -123,7 +124,9 @@ class SubAgent:
 
     async def _handle_tool_call(self, response: str, context: dict) -> str:
         """Parse and execute a tool call from the agent's response."""
-        import json, re
+        import json
+        import re
+
         tool_match = re.search(r"TOOL:\s*(\w+)", response)
         params_match = re.search(r"PARAMS:\s*(\{.*?\})", response, re.DOTALL)
 

@@ -31,11 +31,7 @@ def build_application() -> Application:
     Construct and return a fully-configured Application instance.
     Does NOT call .run_polling() — that happens in main.py.
     """
-    app = (
-        Application.builder()
-        .token(settings.bot_token)
-        .build()
-    )
+    app = Application.builder().token(settings.bot_token).build()
 
     # ── Commands ─────────────────────────────────────────────────────────
     app.add_handler(CommandHandler("start", start_command))
@@ -62,9 +58,7 @@ def build_application() -> Application:
 
     # ── Messages ─────────────────────────────────────────────────────────
     # Non-command text messages — handled last
-    app.add_handler(
-        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
-    )
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     log.info("bot.handlers_registered")
     return app
@@ -72,9 +66,10 @@ def build_application() -> Application:
 
 # ── Standalone command handlers defined here for brevity ─────────────────────
 
+
 async def _memory_command(update, context) -> None:
-    from tgai_agent.security.permissions import require_permission
     from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+    from tgai_agent.security.permissions import require_permission
 
     user = update.effective_user
     if not await require_permission(user.id):
@@ -119,8 +114,8 @@ async def _plugins_command(update, context) -> None:
 
 
 async def _status_command(update, context) -> None:
-    from tgai_agent.security.permissions import require_permission, is_admin
     from tgai_agent.plugins.registry import PluginRegistry
+    from tgai_agent.security.permissions import is_admin, require_permission
 
     user = update.effective_user
     if not await require_permission(user.id):

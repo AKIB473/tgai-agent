@@ -7,10 +7,11 @@ Tests for SubAgent:
 
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from tgai_agent.agent_manager.agent import SubAgent, AgentState
+import pytest
+
+from tgai_agent.agent_manager.agent import AgentState, SubAgent
 
 
 def _make_agent(agent_id: str = "aaaabbbb-0000-0000-0000-000000000001") -> SubAgent:
@@ -236,10 +237,12 @@ class TestSubAgentRunTask:
         mock_memory.get_context = AsyncMock(return_value=[])
         agent._memory = mock_memory
 
-        responses = iter([
-            'TOOL: web_search\nPARAMS: {"query": "Python tutorial"}\n',
-            "RESULT: Python is great",
-        ])
+        responses = iter(
+            [
+                'TOOL: web_search\nPARAMS: {"query": "Python tutorial"}\n',
+                "RESULT: Python is great",
+            ]
+        )
 
         async def mock_complete(user_id, provider, messages, **kwargs):
             return next(responses)

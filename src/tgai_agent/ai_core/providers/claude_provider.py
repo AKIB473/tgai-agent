@@ -26,7 +26,7 @@ class ClaudeProvider(BaseAIProvider):
     @async_retry(max_attempts=3, wait_seconds=2, exceptions=(Exception,))
     async def complete(
         self,
-        messages: List[AIMessage],
+        messages: list[AIMessage],
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,
@@ -34,9 +34,7 @@ class ClaudeProvider(BaseAIProvider):
         # Separate system messages (Claude API handles them differently)
         system_parts = [m.content for m in messages if m.role == "system"]
         chat_messages = [
-            {"role": m.role, "content": m.content}
-            for m in messages
-            if m.role != "system"
+            {"role": m.role, "content": m.content} for m in messages if m.role != "system"
         ]
         system_prompt = "\n\n".join(system_parts) if system_parts else anthropic.NOT_GIVEN
 

@@ -36,9 +36,7 @@ def test_get_unknown_returns_none():
 @pytest.mark.asyncio
 async def test_run_echo_plugin():
     PluginRegistry.register(_EchoPlugin())
-    result = await PluginRegistry.run(
-        "test_echo", {"text": "hello"}, {"user_id": 1}
-    )
+    result = await PluginRegistry.run("test_echo", {"text": "hello"}, {"user_id": 1})
     assert result == "echo: hello"
 
 

@@ -35,11 +35,9 @@ async def upsert_user(
         await db.commit()
 
 
-async def get_user(user_id: int) -> Optional[dict]:
+async def get_user(user_id: int) -> dict | None:
     async with get_db() as db:
-        async with db.execute(
-            "SELECT * FROM users WHERE id = ?", (user_id,)
-        ) as cursor:
+        async with db.execute("SELECT * FROM users WHERE id = ?", (user_id,)) as cursor:
             row = await cursor.fetchone()
             return dict(row) if row else None
 
@@ -60,8 +58,7 @@ async def ban_user(user_id: int) -> None:
 
 
 async def list_users(limit: int = 100) -> list[dict]:
-    async with get_db() as db:
-        async with db.execute(
-            "SELECT * FROM users ORDER BY created_at DESC LIMIT ?", (limit,)
-        ) as cursor:
-            return [dict(r) for r in await cursor.fetchall()]
+    async with get_db() as db, db.execute(
+        "SELECT * FROM users ORDER BY created_at DESC LIMIT ?", (limit,)
+    ) as cursor:
+        return [dict(r) for r in await cursor.fetchall()]

@@ -21,7 +21,7 @@ log = get_logger(__name__)
 
 
 class PluginRegistry:
-    _plugins: Dict[str, BasePlugin] = {}
+    _plugins: dict[str, BasePlugin] = {}
 
     @classmethod
     def register(cls, plugin: BasePlugin) -> None:
@@ -31,7 +31,7 @@ class PluginRegistry:
         log.debug("plugin.registered", name=plugin.name)
 
     @classmethod
-    def get(cls, name: str) -> Optional[BasePlugin]:
+    def get(cls, name: str) -> BasePlugin | None:
         return cls._plugins.get(name)
 
     @classmethod
@@ -110,6 +110,7 @@ async def _log_execution(
     success: bool,
 ) -> None:
     import json
+
     now = utcnow().isoformat()
     try:
         async with get_db() as db:
@@ -119,7 +120,15 @@ async def _log_execution(
                     (user_id, plugin_name, params_json, result_snippet, duration_ms, success, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
-                (user_id, plugin_name, json.dumps(params), result_snippet, duration_ms, int(success), now),
+                (
+                    user_id,
+                    plugin_name,
+                    json.dumps(params),
+                    result_snippet,
+                    duration_ms,
+                    int(success),
+                    now,
+                ),
             )
             await db.commit()
     except Exception as exc:

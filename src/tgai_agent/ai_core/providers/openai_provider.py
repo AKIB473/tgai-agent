@@ -32,7 +32,7 @@ class OpenAIProvider(BaseAIProvider):
     @async_retry(max_attempts=3, wait_seconds=2, exceptions=(Exception,))
     async def complete(
         self,
-        messages: List[AIMessage],
+        messages: list[AIMessage],
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,

@@ -33,18 +33,15 @@ async def create_agent(
                  state, memory_json, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, 'idle', '[]', ?, ?)
             """,
-            (agent_id, user_id, name, role, system_prompt,
-             ai_provider, ai_model, now, now),
+            (agent_id, user_id, name, role, system_prompt, ai_provider, ai_model, now, now),
         )
         await db.commit()
     return agent_id
 
 
-async def get_agent(agent_id: str) -> Optional[dict]:
+async def get_agent(agent_id: str) -> dict | None:
     async with get_db() as db:
-        async with db.execute(
-            "SELECT * FROM agents WHERE id = ?", (agent_id,)
-        ) as cursor:
+        async with db.execute("SELECT * FROM agents WHERE id = ?", (agent_id,)) as cursor:
             row = await cursor.fetchone()
             if not row:
                 return None
@@ -54,18 +51,17 @@ async def get_agent(agent_id: str) -> Optional[dict]:
 
 
 async def list_agents(user_id: int) -> list[dict]:
-    async with get_db() as db:
-        async with db.execute(
-            "SELECT * FROM agents WHERE user_id = ? ORDER BY created_at DESC",
-            (user_id,),
-        ) as cursor:
-            rows = await cursor.fetchall()
-            result = []
-            for row in rows:
-                d = dict(row)
-                d["memory_json"] = json.loads(d["memory_json"])
-                result.append(d)
-            return result
+    async with get_db() as db, db.execute(
+        "SELECT * FROM agents WHERE user_id = ? ORDER BY created_at DESC",
+        (user_id,),
+    ) as cursor:
+        rows = await cursor.fetchall()
+        result = []
+        for row in rows:
+            d = dict(row)
+            d["memory_json"] = json.loads(d["memory_json"])
+            result.append(d)
+        return result
 
 
 async def update_agent_state(agent_id: str, state: str) -> None:

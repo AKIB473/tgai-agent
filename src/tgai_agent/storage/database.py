@@ -8,6 +8,7 @@ Schema versioning uses a simple `schema_version` pragma table.
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+
 import aiosqlite
 
 from tgai_agent.config import settings

@@ -1,7 +1,9 @@
 """
 Root conftest.py — sets up test environment variables before any imports.
 """
+
 import os
+
 from cryptography.fernet import Fernet
 
 # Must be set BEFORE any tgai_agent imports happen
@@ -30,6 +32,7 @@ def reset_settings_cache():
     # Clean up after test
     try:
         from tgai_agent.config import get_settings
+
         get_settings.cache_clear()
     except Exception:
         pass

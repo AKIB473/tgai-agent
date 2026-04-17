@@ -23,11 +23,7 @@ async def agents_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     agents = await list_user_agents(user.id)
     if not agents:
-        text = (
-            "🤖 *Your Agents*\n\n"
-            "You have no agents yet.\n"
-            "Tap ➕ New Agent to create one!"
-        )
+        text = "🤖 *Your Agents*\n\n" "You have no agents yet.\n" "Tap ➕ New Agent to create one!"
     else:
         lines = [f"🤖 *Your Agents* ({len(agents)} total)\n"]
         for a in agents:
@@ -56,7 +52,9 @@ async def handle_new_agent(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     )
 
 
-async def handle_agent_preset(update: Update, context: ContextTypes.DEFAULT_TYPE, preset_name: str) -> None:
+async def handle_agent_preset(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, preset_name: str
+) -> None:
     """Create an agent from a preset."""
     query = update.callback_query
     user = query.from_user
@@ -85,7 +83,9 @@ async def handle_agent_preset(update: Update, context: ContextTypes.DEFAULT_TYPE
     log.info("agent.created_from_preset", user_id=user.id, agent_id=agent.agent_id)
 
 
-async def handle_agent_delete(update: Update, context: ContextTypes.DEFAULT_TYPE, agent_id: str) -> None:
+async def handle_agent_delete(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, agent_id: str
+) -> None:
     query = update.callback_query
     user = query.from_user
     await query.answer()

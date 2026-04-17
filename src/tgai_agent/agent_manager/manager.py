@@ -19,7 +19,7 @@ from tgai_agent.utils.logger import get_logger
 log = get_logger(__name__)
 
 # In-memory registry of live agent instances
-_live_agents: Dict[str, SubAgent] = {}
+_live_agents: dict[str, SubAgent] = {}
 
 
 async def spawn_agent(
@@ -53,7 +53,7 @@ async def spawn_agent(
     return agent
 
 
-async def get_live_agent(agent_id: str) -> Optional[SubAgent]:
+async def get_live_agent(agent_id: str) -> SubAgent | None:
     """Get a live agent instance, loading from DB if not in memory."""
     if agent_id in _live_agents:
         return _live_agents[agent_id]

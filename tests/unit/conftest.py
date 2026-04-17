@@ -2,6 +2,7 @@
 Unit test conftest — isolates the APScheduler singleton between tests
 and prevents 'threads can only be started once' errors.
 """
+
 import pytest
 
 
@@ -13,7 +14,9 @@ def reset_scheduler():
     """
     try:
         from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
         import tgai_agent.task_scheduler.scheduler as sched_mod
+
         # Stop running scheduler if any
         if sched_mod.scheduler._scheduler.running:
             sched_mod.scheduler._scheduler.shutdown(wait=False)
@@ -24,6 +27,7 @@ def reset_scheduler():
     yield
     try:
         import tgai_agent.task_scheduler.scheduler as sched_mod
+
         if sched_mod.scheduler._scheduler.running:
             sched_mod.scheduler._scheduler.shutdown(wait=False)
     except Exception:

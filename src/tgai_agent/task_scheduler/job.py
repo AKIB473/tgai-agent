@@ -15,10 +15,10 @@ class Job:
     id: str
     user_id: int
     name: str
-    trigger_type: str           # 'once' | 'interval' | 'cron'
-    trigger_value: str          # ISO timestamp | seconds | cron expression
-    action_type: str            # 'message' | 'agent_task' | 'plugin'
-    action_payload: dict        # varies by action_type
+    trigger_type: str  # 'once' | 'interval' | 'cron'
+    trigger_value: str  # ISO timestamp | seconds | cron expression
+    action_type: str  # 'message' | 'agent_task' | 'plugin'
+    action_payload: dict  # varies by action_type
     is_active: bool = True
     run_count: int = 0
     description: str = ""
@@ -30,7 +30,7 @@ class Job:
             raise ValueError(f"Invalid action_type: {self.action_type!r}")
 
     @classmethod
-    def from_db_row(cls, row: dict) -> "Job":
+    def from_db_row(cls, row: dict) -> Job:
         return cls(
             id=row["id"],
             user_id=row["user_id"],

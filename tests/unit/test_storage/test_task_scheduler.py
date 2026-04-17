@@ -1,6 +1,7 @@
 """Tests for task scheduler job model."""
 
 import pytest
+
 from tgai_agent.task_scheduler.job import Job
 
 

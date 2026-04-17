@@ -20,8 +20,8 @@ from tgai_agent.utils.logger import get_logger
 
 log = get_logger(__name__)
 
-SUMMARISE_THRESHOLD = 40   # Summarise when history exceeds this many messages
-KEEP_RECENT = 10           # Keep these many recent messages after summarising
+SUMMARISE_THRESHOLD = 40  # Summarise when history exceeds this many messages
+KEEP_RECENT = 10  # Keep these many recent messages after summarising
 
 
 class LongTermMemory:
@@ -61,9 +61,7 @@ class LongTermMemory:
         to_summarise = history[:-KEEP_RECENT]
         to_keep = history[-KEEP_RECENT:]
 
-        conversation_text = "\n".join(
-            f"{m['role'].upper()}: {m['content']}" for m in to_summarise
-        )
+        conversation_text = "\n".join(f"{m['role'].upper()}: {m['content']}" for m in to_summarise)
 
         summary_prompt = [
             AIMessage(
@@ -98,9 +96,7 @@ class LongTermMemory:
             f"[Memory Summary from earlier conversation]\n{summary}",
         )
         for msg in to_keep:
-            await append_message(
-                self.user_id, self.chat_id, msg["role"], msg["content"]
-            )
+            await append_message(self.user_id, self.chat_id, msg["role"], msg["content"])
 
         log.info(
             "long_term_memory.compressed",

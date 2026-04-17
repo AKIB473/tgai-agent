@@ -1,6 +1,7 @@
 """Tests for AIMessage and BaseAIProvider contract."""
 
 import pytest
+
 from tgai_agent.ai_core.base_provider import AIMessage, BaseAIProvider
 
 

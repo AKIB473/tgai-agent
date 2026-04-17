@@ -1,4 +1,5 @@
 """Tests for CodeRunnerPlugin sandboxed execution."""
+
 import pytest
 
 from tgai_agent.plugins.base_plugin import PluginError
@@ -91,18 +92,14 @@ async def test_output_truncated(plugin, context):
 
 @pytest.mark.asyncio
 async def test_list_comprehension(plugin, context):
-    result = await plugin.execute(
-        {"code": "print([x**2 for x in range(5)])"}, context
-    )
+    result = await plugin.execute({"code": "print([x**2 for x in range(5)])"}, context)
     assert "0" in result
     assert "16" in result
 
 
 @pytest.mark.asyncio
 async def test_string_operations(plugin, context):
-    result = await plugin.execute(
-        {"code": "s = 'hello'; print(s.upper())"}, context
-    )
+    result = await plugin.execute({"code": "s = 'hello'; print(s.upper())"}, context)
     assert "HELLO" in result
 
 

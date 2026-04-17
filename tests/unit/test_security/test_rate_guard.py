@@ -1,6 +1,7 @@
 """Tests for the sliding-window rate limiter."""
 
 import pytest
+
 from tgai_agent.security import rate_guard
 
 
@@ -13,10 +14,12 @@ async def test_first_request_allowed():
 @pytest.mark.asyncio
 async def test_rate_limit_exceeded(monkeypatch):
     import time
+
     uid = 77777
     # Fill the window to the limit
     monkeypatch.setattr(rate_guard, "_request_windows", {})
     from collections import deque
+
     now = time.monotonic()
     # Simulate window full
     rate_guard._request_windows[uid] = deque([now] * rate_guard.settings.max_requests_per_minute)

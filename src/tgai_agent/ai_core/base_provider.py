@@ -17,14 +17,14 @@ class AIMessage:
     __slots__ = ("role", "content")
 
     def __init__(self, role: str, content: str) -> None:
-        self.role = role       # 'system' | 'user' | 'assistant'
+        self.role = role  # 'system' | 'user' | 'assistant'
         self.content = content
 
     def to_dict(self) -> dict:
         return {"role": self.role, "content": self.content}
 
     @classmethod
-    def from_dict(cls, d: dict) -> "AIMessage":
+    def from_dict(cls, d: dict) -> AIMessage:
         return cls(role=d["role"], content=d["content"])
 
     def __repr__(self) -> str:
@@ -52,7 +52,7 @@ class BaseAIProvider(ABC):
     @abstractmethod
     async def complete(
         self,
-        messages: List[AIMessage],
+        messages: list[AIMessage],
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,

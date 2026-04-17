@@ -2,9 +2,10 @@
 
 **Production-grade AI-powered Telegram agent platform.**
 
-[![CI](https://github.com/your-username/tgai-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/tgai-agent/actions)
+[![CI](https://github.com/AKIB473/tgai-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/AKIB473/tgai-agent/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-174%20passing-brightgreen.svg)](tests/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ---
@@ -27,22 +28,16 @@
 | **Bot Interface** | Inline keyboard menus, conversation flows, all major commands |
 | **User Mode** | Optional Telethon integration for user-account automation |
 | **Security** | AES-256 key encryption, per-user rate limiting, permission levels, ban system |
-| **Developer DX** | `src/` layout, full type hints, structlog, retry decorator, pre-commit, Docker |
+| **Developer DX** | `src/` layout, full type hints, structlog, retry decorator, pre-commit, Docker, 174 tests |
 
 ---
 
 ## Quick Start
 
-### 1. Install
+### 1. Clone & Install
 
 ```bash
-pip install tgai-agent
-```
-
-Or from source:
-
-```bash
-git clone https://github.com/your-username/tgai-agent
+git clone https://github.com/AKIB473/tgai-agent
 cd tgai-agent
 pip install -e ".[dev]"
 ```
@@ -72,18 +67,21 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 ### 3. Initialise Database
 
 ```bash
-tgai-agent --init-db
+python -m tgai_agent.main --init-db
+# or
+make init-db
 ```
 
 ### 4. Run
 
 ```bash
-tgai-agent
-```
+# Simple start
+python run_bot.py
 
-Or with Docker:
+# Or with the single-instance script (kills old instances first)
+bash start_once.sh
 
-```bash
+# Or with Docker
 docker-compose up -d
 ```
 
@@ -165,7 +163,6 @@ src/tgai_agent/
 Drop a file in `src/tgai_agent/plugins/builtin/` — it auto-registers at startup.
 
 ```python
-# src/tgai_agent/plugins/builtin/my_plugin.py
 from tgai_agent.plugins.base_plugin import BasePlugin, PluginError
 from tgai_agent.plugins.registry import PluginRegistry
 
@@ -182,13 +179,10 @@ class WeatherPlugin(BasePlugin):
         city = params.get("city", "").strip()
         if not city:
             raise PluginError("City is required.")
-        # ... your logic ...
         return f"🌤 Weather in {city}: 22°C, partly cloudy"
 
 PluginRegistry.register(WeatherPlugin())
 ```
-
-Sub-agents will automatically discover and use your plugin as a tool.
 
 ---
 
@@ -219,23 +213,46 @@ Sub-agents will automatically discover and use your plugin as a tool.
 # Install with dev extras
 pip install -e ".[dev]"
 
-# Set up pre-commit hooks
-pre-commit install
-
-# Lint
-make lint
-
-# Format
-make fmt
-
-# Test
+# Run tests (174 tests, all passing)
 make test
 
-# Coverage
+# Coverage report
 make cov
 
-# Build package
-make build
+# Lint + format
+make lint
+make fmt
+
+# Start bot (single instance, kills old ones)
+bash start_once.sh
+
+# Or direct
+python run_bot.py
+```
+
+---
+
+## Test Coverage
+
+```
+174 tests across 15 test files:
+├── test_ai_core/
+│   ├── test_providers.py     # OpenAI, Gemini, Claude (mocked)
+│   ├── test_memory.py        # ShortTermMemory, LongTermMemory
+│   └── test_router.py        # Provider routing
+├── test_plugins/
+│   ├── test_web_search.py    # WebSearchPlugin (mocked httpx)
+│   └── test_code_runner.py   # Sandboxed Python execution
+├── test_security/
+│   ├── test_permissions.py   # Permission levels, ban system
+│   └── test_rate_guard.py    # Sliding-window rate limiting
+├── test_storage/
+│   ├── test_repositories.py  # All CRUD operations
+│   ├── test_encryption_roundtrip.py
+│   ├── test_helpers.py
+│   └── test_task_scheduler.py
+└── test_utils/
+    └── test_helpers_extended.py
 ```
 
 ---
@@ -245,31 +262,25 @@ make build
 ### Docker (recommended)
 
 ```bash
-# Build image
 docker build -t tgai-agent .
-
-# Run with docker-compose
 docker-compose up -d
-
-# View logs
 docker-compose logs -f
 ```
 
 ### Systemd (Linux VPS)
 
 ```ini
-# /etc/systemd/system/tgai-agent.service
 [Unit]
 Description=Telegram AI Agent
 After=network.target
 
 [Service]
-User=tgai
-WorkingDirectory=/opt/tgai-agent
-ExecStart=/opt/tgai-agent/venv/bin/tgai-agent
+User=root
+WorkingDirectory=/root/tgai-agent
+ExecStart=/root/tgai-agent/.venv/bin/python run_bot.py
 Restart=always
 RestartSec=5
-EnvironmentFile=/opt/tgai-agent/.env
+EnvironmentFile=/root/tgai-agent/.env
 
 [Install]
 WantedBy=multi-user.target
@@ -289,12 +300,6 @@ systemctl enable --now tgai-agent
 - Telethon user mode is **disabled by default** — opt in via `USER_MODE_ENABLED=true`
 - Rate limiting prevents abuse; admins can ban users via the permission system
 - Sessions directory should have `chmod 700` on production servers
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). PRs welcome!
 
 ---
 

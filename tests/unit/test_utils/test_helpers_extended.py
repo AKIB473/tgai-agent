@@ -1,19 +1,21 @@
 """Extended helper function tests."""
+
+from datetime import UTC, timezone
+
 import pytest
-from datetime import timezone
 
 from tgai_agent.utils.helpers import (
-    truncate,
-    parse_duration,
-    sanitise_markdown,
     chunk_list,
     flatten,
     hash_user_id,
+    parse_duration,
+    sanitise_markdown,
+    truncate,
     utcnow,
 )
 
-
 # ── truncate ──────────────────────────────────────────────────────────────────
+
 
 def test_truncate_short_string():
     assert truncate("hi", 10) == "hi"
@@ -39,6 +41,7 @@ def test_truncate_empty_string():
 
 
 # ── parse_duration ────────────────────────────────────────────────────────────
+
 
 def test_parse_duration_seconds():
     assert parse_duration("30s") == 30
@@ -81,6 +84,7 @@ def test_parse_duration_with_spaces():
 
 # ── chunk_list ────────────────────────────────────────────────────────────────
 
+
 def test_chunk_list_even():
     assert chunk_list([1, 2, 3, 4], 2) == [[1, 2], [3, 4]]
 
@@ -103,6 +107,7 @@ def test_chunk_list_size_larger_than_list():
 
 # ── flatten ───────────────────────────────────────────────────────────────────
 
+
 def test_flatten_basic():
     assert flatten([[1, 2], [3, 4], [5]]) == [1, 2, 3, 4, 5]
 
@@ -116,6 +121,7 @@ def test_flatten_single():
 
 
 # ── hash_user_id ──────────────────────────────────────────────────────────────
+
 
 def test_hash_user_id_consistent():
     h1 = hash_user_id(12345)
@@ -139,18 +145,21 @@ def test_hash_user_id_is_hex():
 
 # ── utcnow ────────────────────────────────────────────────────────────────────
 
+
 def test_utcnow_returns_utc():
     dt = utcnow()
-    assert dt.tzinfo == timezone.utc
+    assert dt.tzinfo == UTC
 
 
 def test_utcnow_is_datetime():
     from datetime import datetime
+
     dt = utcnow()
     assert isinstance(dt, datetime)
 
 
 # ── sanitise_markdown ─────────────────────────────────────────────────────────
+
 
 def test_sanitise_markdown_escapes_asterisk():
     result = sanitise_markdown("*bold*")

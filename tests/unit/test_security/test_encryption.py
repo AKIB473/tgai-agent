@@ -1,6 +1,7 @@
 """Tests for AES-256 encryption layer."""
 
 import pytest
+
 from tgai_agent.storage.encryption import decrypt, encrypt
 
 

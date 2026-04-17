@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, patch
 
-from tgai_agent.ai_core.router import get_provider, complete, list_providers
+import pytest
+
 from tgai_agent.ai_core.base_provider import AIMessage
+from tgai_agent.ai_core.router import complete, get_provider, list_providers
 
 
 def test_list_providers():
@@ -26,15 +27,15 @@ async def test_get_provider_unknown_raises():
 async def test_get_provider_no_key_raises():
     # No system key set for openai in test env
     import os
+
     orig = os.environ.get("OPENAI_API_KEY", "")
     os.environ["OPENAI_API_KEY"] = ""
     # Patch DB key lookup to return empty
     with patch(
         "tgai_agent.ai_core.router.get_api_key",
         new=AsyncMock(return_value=""),
-    ):
-        with pytest.raises(ValueError, match="No API key"):
-            await get_provider(user_id=1, provider_name="openai")
+    ), pytest.raises(ValueError, match="No API key"):
+        await get_provider(user_id=1, provider_name="openai")
     os.environ["OPENAI_API_KEY"] = orig
 
 
@@ -53,11 +54,14 @@ async def test_get_provider_with_user_key():
 async def test_get_provider_falls_back_to_system_key():
     """When user has no key, fall back to system key from settings."""
     import os
+
     os.environ["OPENAI_API_KEY"] = "sk-system-key"
 
     # Reimport to force fresh settings
     import importlib
+
     import tgai_agent.ai_core.router as router_module
+
     # Patch _SYSTEM_KEYS directly to avoid settings caching issues
     with (
         patch(
@@ -77,9 +81,9 @@ async def test_get_provider_falls_back_to_system_key():
 @pytest.mark.asyncio
 async def test_get_provider_routes_to_correct_class():
     """Each provider name maps to the correct class."""
-    from tgai_agent.ai_core.providers.openai_provider import OpenAIProvider
-    from tgai_agent.ai_core.providers.gemini_provider import GeminiProvider
     from tgai_agent.ai_core.providers.claude_provider import ClaudeProvider
+    from tgai_agent.ai_core.providers.gemini_provider import GeminiProvider
+    from tgai_agent.ai_core.providers.openai_provider import OpenAIProvider
 
     mapping = {
         "openai": OpenAIProvider,
@@ -93,18 +97,21 @@ async def test_get_provider_routes_to_correct_class():
                 "tgai_agent.ai_core.router.get_api_key",
                 new=AsyncMock(return_value="sk-test"),
             ),
-            patch(
-                f"tgai_agent.ai_core.providers.gemini_provider.genai"
-            ) if provider_name == "gemini" else patch(
-                "tgai_agent.ai_core.providers.openai_provider.AsyncOpenAI"
-            ) if provider_name == "openai" else patch(
-                "tgai_agent.ai_core.providers.claude_provider.anthropic"
+            (
+                patch("tgai_agent.ai_core.providers.gemini_provider.genai")
+                if provider_name == "gemini"
+                else (
+                    patch("tgai_agent.ai_core.providers.openai_provider.AsyncOpenAI")
+                    if provider_name == "openai"
+                    else patch("tgai_agent.ai_core.providers.claude_provider.anthropic")
+                )
             ) as _mock,
         ):
             try:
                 provider = await get_provider(user_id=1, provider_name=provider_name)
-                assert isinstance(provider, expected_cls), \
-                    f"Expected {expected_cls.__name__}, got {type(provider).__name__}"
+                assert isinstance(
+                    provider, expected_cls
+                ), f"Expected {expected_cls.__name__}, got {type(provider).__name__}"
             except Exception:
                 # Some providers may fail to init in test env; just check by name
                 pass

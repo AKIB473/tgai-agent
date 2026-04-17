@@ -32,6 +32,7 @@ async def can_send_to_peer(peer_id: int) -> bool:
     Returns True if we may send.
     """
     import time
+
     now = time.monotonic()
     window = _send_windows[peer_id]
     while window and window[0] < now - 60:

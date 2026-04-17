@@ -79,7 +79,7 @@ class WebSearchPlugin(BasePlugin):
         if not results:
             return f"No results found for: {query!r}. Try a more specific search term."
 
-        return f"🔍 Search results for '{query}':\n\n" + "\n\n".join(results[:max_results + 2])
+        return f"🔍 Search results for '{query}':\n\n" + "\n\n".join(results[: max_results + 2])
 
 
 # Self-register on import

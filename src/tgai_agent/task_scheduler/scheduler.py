@@ -12,7 +12,7 @@ Tasks are loaded from the DB on startup and re-registered.
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from typing import Optional
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -123,7 +123,7 @@ class TaskScheduler:
             if job.trigger_type == "once":
                 dt = datetime.fromisoformat(job.trigger_value)
                 if dt.tzinfo is None:
-                    dt = dt.replace(tzinfo=timezone.utc)
+                    dt = dt.replace(tzinfo=UTC)
                 return DateTrigger(run_date=dt)
 
             elif job.trigger_type == "interval":

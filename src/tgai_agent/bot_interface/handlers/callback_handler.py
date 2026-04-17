@@ -9,19 +9,20 @@ from __future__ import annotations
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from tgai_agent.agent_manager.manager import list_user_agents, talk_to_agent
 from tgai_agent.bot_interface.commands.agents_cmd import (
     handle_agent_delete,
     handle_agent_preset,
     handle_new_agent,
 )
-from tgai_agent.bot_interface.commands.tasks_cmd import handle_task_delete
 from tgai_agent.bot_interface.commands.config_cmd import (
     handle_set_api_key_prompt,
     handle_set_prompt,
 )
+from tgai_agent.bot_interface.commands.tasks_cmd import handle_task_delete
 from tgai_agent.bot_interface.menus.keyboards import (
-    agents_menu,
     agent_action_menu,
+    agents_menu,
     config_menu,
     confirm_menu,
     main_menu,
@@ -32,7 +33,6 @@ from tgai_agent.bot_interface.menus.keyboards import (
 from tgai_agent.security.permissions import require_permission
 from tgai_agent.storage.repositories.chat_repo import upsert_chat_config
 from tgai_agent.storage.repositories.task_repo import list_tasks
-from tgai_agent.agent_manager.manager import list_user_agents, talk_to_agent
 from tgai_agent.utils.logger import get_logger
 
 log = get_logger(__name__)
@@ -86,6 +86,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif data == "menu:memory":
         chat_id = query.message.chat_id
         from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+
         memory = ShortTermMemory(user.id, chat_id)
         summary = await memory.summary()
         await query.edit_message_text(
@@ -96,6 +97,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     elif data == "menu:plugins":
         from tgai_agent.plugins.registry import PluginRegistry
+
         plugins_list = PluginRegistry.list_all()
         lines = ["🔌 *Available Plugins:*\n"]
         for p in plugins_list:
@@ -155,6 +157,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif data == "config:autoreply":
         chat_id = query.message.chat_id
         from tgai_agent.storage.repositories.chat_repo import get_chat_config
+
         current = await get_chat_config(user.id, chat_id)
         new_val = not current.get("auto_reply", False)
         await upsert_chat_config(user.id, chat_id, auto_reply=new_val)
@@ -182,6 +185,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif data.startswith("agent:view:"):
         agent_id = data.split(":")[2]
         from tgai_agent.storage.repositories.agent_repo import get_agent
+
         agent_data = await get_agent(agent_id)
         if not agent_data or agent_data["user_id"] != user.id:
             await query.edit_message_text("❌ Agent not found.")
@@ -234,6 +238,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif data.startswith("task:view:"):
         task_id = data.split(":")[2]
         from tgai_agent.storage.repositories.task_repo import get_task
+
         task_data = await get_task(task_id)
         if not task_data or task_data["user_id"] != user.id:
             await query.edit_message_text("❌ Task not found.")
@@ -260,6 +265,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 async def _handle_status(query, context) -> None:
     from tgai_agent.plugins.registry import PluginRegistry
+
     plugins = PluginRegistry.list_all()
     text = (
         "📊 *System Status*\n\n"
