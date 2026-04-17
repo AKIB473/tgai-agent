@@ -212,6 +212,18 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         agent_id = data.split(":")[2]
         await handle_agent_delete(update, context, agent_id)
 
+    elif data == "agent:custom":
+        await query.edit_message_text(
+            "✏️ *Custom Agent*\n\n"
+            "Send a message in this format:\n\n"
+            "`Name | role | System prompt`\n\n"
+            "Example:\n"
+            "`My Pirate | assistant | You are a helpful pirate who speaks in pirate dialect`\n\n"
+            "Or just send the name and I'll ask for the rest.",
+            parse_mode="Markdown",
+        )
+        context.user_data["awaiting_custom_agent"] = True
+
     elif data.startswith("agent:talk:"):
         agent_id = data.split(":")[2]
         context.user_data["talking_to_agent"] = agent_id

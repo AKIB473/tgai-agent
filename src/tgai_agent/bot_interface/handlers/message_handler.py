@@ -63,6 +63,43 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await message.reply_text(truncate(response, 4096))
         return
 
+    # ── Custom agent creation ─────────────────────────────────────────────
+    if context.user_data.get("awaiting_custom_agent"):
+        context.user_data.pop("awaiting_custom_agent", None)
+        text = message.text.strip()
+        parts = [p.strip() for p in text.split("|")]
+        if len(parts) >= 3:
+            name, role, system_prompt = parts[0], parts[1], "|".join(parts[2:])
+        elif len(parts) == 2:
+            name, role, system_prompt = (
+                parts[0],
+                parts[1],
+                f"You are a helpful {parts[1]} assistant.",
+            )
+        else:
+            name, role, system_prompt = parts[0], "assistant", "You are a helpful AI assistant."
+
+        config = await get_chat_config(user.id, chat.id)
+        from tgai_agent.agent_manager.manager import spawn_agent
+
+        agent = await spawn_agent(
+            user_id=user.id,
+            name=name,
+            role=role,
+            system_prompt=system_prompt,
+            ai_provider=config.get("ai_provider", "openai"),
+            ai_model=config.get("ai_model", "gpt-4o-mini"),
+        )
+        await upsert_user(user.id, username=user.username, first_name=user.first_name)
+        await message.reply_text(
+            f"✅ *{agent.name}* created!\n\n"
+            f"Role: _{role}_\n"
+            f"Provider: `{config.get('ai_provider', 'openai')}`\n\n"
+            "Use /agents to see and talk to your agent.",
+            parse_mode="Markdown",
+        )
+        return
+
     # ── 3. Register user ─────────────────────────────────────────────────
     await upsert_user(user.id, username=user.username, first_name=user.first_name)
 

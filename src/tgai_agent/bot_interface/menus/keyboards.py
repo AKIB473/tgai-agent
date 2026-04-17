@@ -120,7 +120,14 @@ def tasks_menu(tasks: list[dict]) -> InlineKeyboardMarkup:
 
 
 def presets_menu(presets: list[str]) -> InlineKeyboardMarkup:
-    rows = [[InlineKeyboardButton(p.title(), callback_data=f"agent:preset:{p}")] for p in presets]
+    from tgai_agent.agent_manager.roles.presets import AGENT_PRESETS
+
+    rows = []
+    for p in presets:
+        preset = AGENT_PRESETS.get(p, {})
+        emoji = preset.get("emoji", "🤖")
+        label = f"{emoji} {p.title()}"
+        rows.append([InlineKeyboardButton(label, callback_data=f"agent:preset:{p}")])
     rows.append([InlineKeyboardButton("✏️ Custom", callback_data="agent:custom")])
     rows.append([InlineKeyboardButton("◀️ Back", callback_data="menu:agents")])
     return InlineKeyboardMarkup(rows)
