@@ -152,7 +152,7 @@ class CodeRunnerPlugin(BasePlugin):
 
         try:
             result = await asyncio.wait_for(
-                asyncio.get_event_loop().run_in_executor(None, _run_code_sync, code),
+                asyncio.get_running_loop().run_in_executor(None, _run_code_sync, code),
                 timeout=TIMEOUT_SECONDS,
             )
         except TimeoutError:

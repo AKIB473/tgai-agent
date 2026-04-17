@@ -101,6 +101,9 @@ class SubAgent:
 
         try:
             return await self._react_loop(task_description, context)
+        except Exception as exc:
+            log.error("agent.run_task_failed", agent=self.name, error=str(exc))
+            return f"⚠️ Task failed: {exc}"
         finally:
             self.state = AgentState.IDLE
             await update_agent_state(self.agent_id, AgentState.IDLE)
