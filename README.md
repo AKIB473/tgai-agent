@@ -5,7 +5,7 @@
 [![CI](https://github.com/AKIB473/tgai-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/AKIB473/tgai-agent/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-186%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-207%20passing-brightgreen.svg)](tests/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ---
@@ -213,7 +213,7 @@ PluginRegistry.register(WeatherPlugin())
 # Install with dev extras
 pip install -e ".[dev]"
 
-# Run tests (186 tests, all passing)
+# Run tests (207 tests, all passing)
 make test
 
 # Coverage report
@@ -235,7 +235,7 @@ python run_bot.py
 ## Test Coverage
 
 ```
-186 tests across 16 test files:
+207 tests across 16 test files:
 ├── test_ai_core/
 │   ├── test_providers.py     # OpenAI, Gemini, Claude (mocked)
 │   ├── test_memory.py        # ShortTermMemory, LongTermMemory
