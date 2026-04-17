@@ -15,7 +15,6 @@ from tgai_agent.storage.repositories.chat_repo import (
     clear_messages,
     get_messages,
 )
-from tgai_agent.utils.helpers import utcnow
 from tgai_agent.utils.logger import get_logger
 
 log = get_logger(__name__)
@@ -88,7 +87,6 @@ class LongTermMemory:
         # Replace history: delete all → insert summary → insert kept messages
         await clear_messages(self.user_id, self.chat_id)
 
-        now = utcnow().isoformat()
         await append_message(
             self.user_id,
             self.chat_id,
