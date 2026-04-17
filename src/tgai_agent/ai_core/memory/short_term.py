@@ -7,8 +7,6 @@ for injection into AI provider calls.
 
 from __future__ import annotations
 
-from typing import List
-
 from tgai_agent.ai_core.base_provider import AIMessage
 from tgai_agent.storage.repositories.chat_repo import (
     append_message,
