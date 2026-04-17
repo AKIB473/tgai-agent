@@ -12,7 +12,6 @@ from __future__ import annotations
 import asyncio
 import functools
 from collections.abc import Callable
-from typing import Tuple, Type
 
 from tgai_agent.utils.logger import get_logger
 

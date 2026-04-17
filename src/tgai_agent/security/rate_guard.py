@@ -12,7 +12,6 @@ from __future__ import annotations
 import asyncio
 import time
 from collections import defaultdict, deque
-from typing import Deque, Dict
 
 from tgai_agent.config import settings
 from tgai_agent.utils.logger import get_logger

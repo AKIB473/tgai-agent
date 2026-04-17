@@ -4,8 +4,6 @@ ai_core/providers/openai_provider.py — OpenAI ChatCompletion provider.
 
 from __future__ import annotations
 
-from typing import List
-
 from openai import AsyncOpenAI
 
 from tgai_agent.ai_core.base_provider import AIMessage, BaseAIProvider

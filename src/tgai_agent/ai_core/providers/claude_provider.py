@@ -4,8 +4,6 @@ ai_core/providers/claude_provider.py — Anthropic Claude provider.
 
 from __future__ import annotations
 
-from typing import List
-
 import anthropic
 
 from tgai_agent.ai_core.base_provider import AIMessage, BaseAIProvider

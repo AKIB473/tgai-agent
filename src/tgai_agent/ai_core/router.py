@@ -8,7 +8,7 @@ user key is configured.
 
 from __future__ import annotations
 
-from typing import Dict, Type
+
 
 from tgai_agent.ai_core.base_provider import AIMessage, BaseAIProvider
 from tgai_agent.ai_core.providers.claude_provider import ClaudeProvider

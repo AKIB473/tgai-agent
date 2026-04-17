@@ -23,7 +23,7 @@ jobs:
         run: pip install -e ".[dev]"
 
       - name: Ruff
-        run: ruff check src/ --ignore E501,F401
+        run: ruff check src/ --select E,F,W,I --ignore E501,F401,F811,W291,W293
 
       - name: Black (check only)
         run: black --check src/ tests/ --line-length 100
