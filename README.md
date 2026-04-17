@@ -5,7 +5,7 @@
 [![CI](https://github.com/AKIB473/tgai-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/AKIB473/tgai-agent/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-174%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-186%20passing-brightgreen.svg)](tests/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ---
@@ -22,7 +22,7 @@
 |---|---|
 | **AI Providers** | OpenAI, Google Gemini, Anthropic Claude — switchable per chat |
 | **Memory** | Short-term (DB-backed sliding window) + long-term (AI summarisation) |
-| **Sub-agents** | Autonomous agents with roles, memory, and tool-use (ReAct loop) |
+| **Sub-agents** | Autonomous agents with 8 role presets, memory, and tool-use (ReAct loop, 10 iterations) |
 | **Task Scheduler** | One-shot, interval, and cron triggers via APScheduler |
 | **Plugin System** | Auto-discovered; built-ins: web search, URL summariser, sandboxed Python runner |
 | **Bot Interface** | Inline keyboard menus, conversation flows, all major commands |
@@ -213,7 +213,7 @@ PluginRegistry.register(WeatherPlugin())
 # Install with dev extras
 pip install -e ".[dev]"
 
-# Run tests (174 tests, all passing)
+# Run tests (186 tests, all passing)
 make test
 
 # Coverage report
@@ -235,11 +235,14 @@ python run_bot.py
 ## Test Coverage
 
 ```
-174 tests across 15 test files:
+186 tests across 16 test files:
 ├── test_ai_core/
 │   ├── test_providers.py     # OpenAI, Gemini, Claude (mocked)
 │   ├── test_memory.py        # ShortTermMemory, LongTermMemory
 │   └── test_router.py        # Provider routing
+├── test_agent/
+│   ├── test_agent.py         # SubAgent think/run_task/state/last_active
+│   └── test_presets.py       # All 8 role presets, get_preset, list_presets
 ├── test_plugins/
 │   ├── test_web_search.py    # WebSearchPlugin (mocked httpx)
 │   └── test_code_runner.py   # Sandboxed Python execution

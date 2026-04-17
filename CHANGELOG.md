@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-17
+
+### Added
+- 8 built-in agent role presets: researcher 🔬, coder 💻, writer ✍️, analyst 📊, assistant 🤖, translator 🌍, summarizer 📋, tutor 🎓
+- Agent creation wizard with preset picker inline keyboard
+- Custom agent creation flow via `Name | role | system prompt` format
+- `last_active` timestamp tracking on SubAgent
+- `get_preset_display()` helper for emoji + role name display
+
+### Changed
+- ReAct loop max iterations increased from 5 → 10
+- `run_task()` now catches exceptions and returns error string instead of raising
+- Memory namespace uses stable MD5 hash of agent_id (not hex slice)
+- `presets_menu` keyboard now shows emoji + description per role
+
+### Fixed
+- Python 3.12 compatibility: replaced `asyncio.get_event_loop()` with `asyncio.get_running_loop()` in `code_runner.py`
+
 ## [1.0.0] - 2026-04-16
 
 ### Added

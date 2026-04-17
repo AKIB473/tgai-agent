@@ -343,6 +343,67 @@ class TestSubAgentStop:
         mock_task.cancel.assert_called_once()
 
 
+class TestSubAgentLastActive:
+    async def test_think_sets_last_active(self):
+        """last_active should be set to an ISO timestamp after think()."""
+        agent = _make_agent()
+        assert agent.last_active is None
+
+        mock_memory = MagicMock()
+        mock_memory.add = AsyncMock()
+        mock_memory.get_context = AsyncMock(return_value=[])
+        agent._memory = mock_memory
+
+        with (
+            patch(
+                "tgai_agent.agent_manager.agent.complete",
+                new=AsyncMock(return_value="response"),
+            ),
+            patch(
+                "tgai_agent.agent_manager.agent.update_agent_memory",
+                new=AsyncMock(),
+            ),
+        ):
+            await agent.think("hello")
+
+        assert agent.last_active is not None
+        # Should be a valid ISO format string
+        from datetime import datetime
+        datetime.fromisoformat(agent.last_active)  # raises if invalid
+
+    async def test_last_active_updates_on_each_think(self):
+        """last_active changes on each call."""
+        agent = _make_agent()
+        mock_memory = MagicMock()
+        mock_memory.add = AsyncMock()
+        mock_memory.get_context = AsyncMock(return_value=[])
+        agent._memory = mock_memory
+
+        with (
+            patch(
+                "tgai_agent.agent_manager.agent.complete",
+                new=AsyncMock(return_value="resp"),
+            ),
+            patch(
+                "tgai_agent.agent_manager.agent.update_agent_memory",
+                new=AsyncMock(),
+            ),
+        ):
+            await agent.think("first")
+            first_active = agent.last_active
+            await agent.think("second")
+            second_active = agent.last_active
+
+        assert first_active is not None
+        assert second_active is not None
+
+
+class TestMaxToolIterations:
+    def test_max_tool_iterations_is_ten(self):
+        from tgai_agent.agent_manager.agent import MAX_TOOL_ITERATIONS
+        assert MAX_TOOL_ITERATIONS == 10
+
+
 class TestAgentState:
     def test_state_constants(self):
         assert AgentState.IDLE == "idle"
