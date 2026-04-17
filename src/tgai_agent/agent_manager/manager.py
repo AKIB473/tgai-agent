@@ -4,8 +4,6 @@ agent_manager/manager.py — Lifecycle management for sub-agents.
 
 from __future__ import annotations
 
-from typing import Dict, Optional
-
 from tgai_agent.agent_manager.agent import SubAgent
 from tgai_agent.storage.repositories.agent_repo import (
     create_agent,

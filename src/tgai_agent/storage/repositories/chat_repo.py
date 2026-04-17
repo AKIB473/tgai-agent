@@ -4,8 +4,6 @@ storage/repositories/chat_repo.py — Per-chat AI configuration.
 
 from __future__ import annotations
 
-from typing import Optional
-
 from tgai_agent.storage.database import get_db
 from tgai_agent.storage.encryption import decrypt, encrypt
 from tgai_agent.utils.helpers import utcnow
