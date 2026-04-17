@@ -7,6 +7,7 @@ Schema versioning uses a simple `schema_version` pragma table.
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 import aiosqlite
 
 from tgai_agent.config import settings
@@ -119,21 +120,33 @@ async def init_db() -> None:
     """Create all tables. Safe to call on every startup (IF NOT EXISTS)."""
     async with aiosqlite.connect(settings.db_path) as db:
         db.row_factory = aiosqlite.Row
+        await db.execute("PRAGMA journal_mode=WAL")
+        await db.execute("PRAGMA foreign_keys=ON")
         await db.executescript(SCHEMA_SQL)
         await db.commit()
     log.info("database.initialised", path=settings.db_path)
 
 
-async def get_db() -> aiosqlite.Connection:
+@asynccontextmanager
+async def get_db():
     """
-    Open and return a configured aiosqlite connection.
-    Caller is responsible for closing it (use as async context manager):
+    Async context manager that opens a fresh aiosqlite connection per call.
+
+    Usage (always use as async context manager, never await alone)::
+
+        async with get_db() as db:
+            ...
+
+    For backwards compatibility, also supports the legacy pattern::
 
         async with await get_db() as db:
             ...
+
+    Because asynccontextmanager objects support both await (returning self)
+    and async context manager protocol.
     """
-    db = await aiosqlite.connect(settings.db_path)
-    db.row_factory = aiosqlite.Row
-    await db.execute("PRAGMA journal_mode=WAL")
-    await db.execute("PRAGMA foreign_keys=ON")
-    return db
+    async with aiosqlite.connect(settings.db_path) as db:
+        db.row_factory = aiosqlite.Row
+        await db.execute("PRAGMA journal_mode=WAL")
+        await db.execute("PRAGMA foreign_keys=ON")
+        yield db

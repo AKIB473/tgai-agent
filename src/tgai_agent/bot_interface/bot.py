@@ -45,9 +45,6 @@ def build_application() -> Application:
     # Config uses a ConversationHandler for multi-step input
     app.add_handler(build_config_conversation())
 
-    # Fallback plain /config for when conversation isn't active
-    app.add_handler(CommandHandler("config", config_command))
-
     # Memory command
     app.add_handler(CommandHandler("memory", _memory_command))
 

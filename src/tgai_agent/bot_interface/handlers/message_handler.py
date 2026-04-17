@@ -18,6 +18,7 @@ from tgai_agent.ai_core.base_provider import AIMessage
 from tgai_agent.ai_core.memory.long_term import LongTermMemory
 from tgai_agent.ai_core.memory.short_term import ShortTermMemory
 from tgai_agent.ai_core.router import complete
+from tgai_agent.agent_manager.manager import talk_to_agent
 from tgai_agent.bot_interface.menus.keyboards import auto_reply_prompt_menu
 from tgai_agent.security.permissions import require_permission
 from tgai_agent.security.rate_guard import is_rate_limited
@@ -50,6 +51,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await message.reply_text(
             "⚠️ You're sending messages too fast. Please wait a moment."
         )
+        return
+
+    # ── Agent talk mode ──────────────────────────────────────────────────
+    agent_id = context.user_data.get("talking_to_agent")
+    if agent_id:
+        if message.text.strip().lower() in ("/done", "/stop"):
+            context.user_data.pop("talking_to_agent", None)
+            await message.reply_text("👋 Stopped talking to agent. Back to normal mode.")
+            return
+        await context.bot.send_chat_action(chat_id=chat.id, action="typing")
+        response = await talk_to_agent(agent_id, user.id, message.text)
+        await message.reply_text(truncate(response, 4096))
         return
 
     # ── 3. Register user ─────────────────────────────────────────────────

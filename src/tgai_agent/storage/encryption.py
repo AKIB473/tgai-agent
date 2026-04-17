@@ -18,13 +18,15 @@ from tgai_agent.utils.logger import get_logger
 log = get_logger(__name__)
 
 _fernet: Fernet | None = None
+_fernet_key: str | None = None
 
 
 def _get_fernet() -> Fernet:
-    global _fernet
-    if _fernet is None:
-        key = settings.encryption_key.encode()
-        _fernet = Fernet(key)
+    global _fernet, _fernet_key
+    current_key = settings.encryption_key
+    if _fernet is None or _fernet_key != current_key:
+        _fernet_key = current_key
+        _fernet = Fernet(current_key.encode())
     return _fernet
 
 

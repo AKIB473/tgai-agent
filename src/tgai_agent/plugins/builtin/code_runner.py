@@ -15,13 +15,11 @@ Security model:
 from __future__ import annotations
 
 import asyncio
-import io
-import sys
-from contextlib import redirect_stdout
 from typing import Any
 
 from RestrictedPython import compile_restricted, safe_globals
 from RestrictedPython.Guards import safe_builtins, guarded_iter_unpack_sequence
+from RestrictedPython.PrintCollector import PrintCollector  # noqa: F401
 
 from tgai_agent.plugins.base_plugin import BasePlugin, PluginError
 from tgai_agent.plugins.registry import PluginRegistry
@@ -48,6 +46,7 @@ _ALLOWED_BUILTINS: dict = {
 }
 _ALLOWED_BUILTINS["_getiter_"] = iter
 _ALLOWED_BUILTINS["_iter_unpack_sequence_"] = guarded_iter_unpack_sequence
+_ALLOWED_BUILTINS["_getattr_"] = getattr
 
 
 def _run_code_sync(code: str) -> str:
@@ -57,20 +56,31 @@ def _run_code_sync(code: str) -> str:
     except SyntaxError as exc:
         raise PluginError(f"Syntax error: {exc}") from exc
 
+    # RestrictedPython transforms `print(x)` into `_print._call_print(x)` and
+    # injects `_print = _print_(_getattr_)` at the top of the code block.
+    # So _print_ must be the PrintCollector *class* (called with _getattr_ arg).
+    # After exec, globs['_print'] holds the instance; call it with no args
+    # to retrieve all captured output.
     globs: dict[str, Any] = {
         **safe_globals,
         "__builtins__": _ALLOWED_BUILTINS,
         "__name__": "__sandbox__",
+        "_print_": PrintCollector,
+        "_getattr_": getattr,
+        "_getiter_": iter,
+        "_iter_unpack_sequence_": guarded_iter_unpack_sequence,
     }
 
-    output_buffer = io.StringIO()
     try:
-        with redirect_stdout(output_buffer):
-            exec(byte_code, globs)  # noqa: S102 — intentional restricted exec
+        exec(byte_code, globs)  # noqa: S102 — intentional restricted exec
     except Exception as exc:
         raise PluginError(f"Runtime error: {exc}") from exc
 
-    output = output_buffer.getvalue()
+    # globs['_print'] is the PrintCollector instance injected by RestrictedPython.
+    # Calling it with no args returns the joined captured output.
+    _print_instance = globs.get("_print")
+    output = _print_instance() if _print_instance is not None else ""
+
     if len(output) > MAX_OUTPUT_CHARS:
         output = output[:MAX_OUTPUT_CHARS] + "\n... [output truncated]"
     return output or "(no output)"

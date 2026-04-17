@@ -13,15 +13,6 @@ import asyncio
 import functools
 from typing import Callable, Tuple, Type
 
-from tenacity import (
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-    before_sleep_log,
-)
-import logging
-
 from tgai_agent.utils.logger import get_logger
 
 log = get_logger(__name__)

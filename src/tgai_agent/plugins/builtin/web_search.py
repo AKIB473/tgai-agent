@@ -47,22 +47,39 @@ class WebSearchPlugin(BasePlugin):
 
         results = []
 
-        # Abstract (main answer)
+        answer = data.get("Answer", "").strip()
+        if answer:
+            results.append(f"💡 Answer: {answer}")
+
         abstract = data.get("AbstractText", "").strip()
         if abstract:
-            results.append(f"📖 Summary: {abstract}")
+            source = data.get("AbstractSource", "")
+            results.append(f"📖 {abstract}" + (f"\n  Source: {source}" if source else ""))
 
-        # Related topics
-        for topic in data.get("RelatedTopics", [])[:max_results]:
+        definition = data.get("Definition", "").strip()
+        if definition:
+            results.append(f"📚 Definition: {definition}")
+
+        for topic in data.get("RelatedTopics", []):
+            if len(results) >= max_results + 2:
+                break
             if isinstance(topic, dict) and "Text" in topic:
                 url = topic.get("FirstURL", "")
-                text = topic["Text"]
-                results.append(f"• {text}\n  {url}")
+                results.append(f"• {topic['Text']}" + (f"\n  {url}" if url else ""))
+            elif isinstance(topic, dict) and "Topics" in topic:
+                for sub in topic["Topics"][:2]:
+                    if isinstance(sub, dict) and "Text" in sub:
+                        results.append(f"• {sub['Text']}")
+
+        for r in data.get("Results", [])[:3]:
+            if isinstance(r, dict) and "Text" in r:
+                url = r.get("FirstURL", "")
+                results.append(f"🔗 {r['Text']}" + (f"\n  {url}" if url else ""))
 
         if not results:
-            return f"No results found for: {query!r}"
+            return f"No results found for: {query!r}. Try a more specific search term."
 
-        return f"🔍 Search results for '{query}':\n\n" + "\n\n".join(results)
+        return f"🔍 Search results for '{query}':\n\n" + "\n\n".join(results[:max_results + 2])
 
 
 # Self-register on import

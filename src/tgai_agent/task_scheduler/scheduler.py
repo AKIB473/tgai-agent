@@ -50,7 +50,13 @@ class TaskScheduler:
 
     def start(self) -> None:
         if not self._scheduler.running:
-            self._scheduler.start()
+            try:
+                self._scheduler.start()
+            except (RuntimeError, Exception):
+                # Recreate scheduler if the underlying executor was already shut down
+                # (can happen in tests where the event loop is replaced between runs)
+                self._scheduler = AsyncIOScheduler(timezone="UTC")
+                self._scheduler.start()
             log.info("scheduler.started")
 
     def stop(self) -> None:

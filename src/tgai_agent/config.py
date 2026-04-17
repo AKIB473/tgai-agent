@@ -49,8 +49,12 @@ class Settings(BaseSettings):
     @field_validator("admin_ids", mode="before")
     @classmethod
     def parse_admin_ids(cls, v):
+        if isinstance(v, (int, float)):
+            return [int(v)]
         if isinstance(v, str):
             return [int(x.strip()) for x in v.split(",") if x.strip()]
+        if isinstance(v, (list, tuple)):
+            return [int(x) for x in v if str(x).strip()]
         return v
 
     @field_validator("log_level")

@@ -27,7 +27,7 @@ async def create_task(
 ) -> str:
     task_id = str(uuid.uuid4())
     now = utcnow().isoformat()
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             """
             INSERT INTO tasks
@@ -47,7 +47,7 @@ async def create_task(
 
 
 async def get_task(task_id: str) -> Optional[dict]:
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(
             "SELECT * FROM tasks WHERE id = ?", (task_id,)
         ) as cursor:
@@ -66,7 +66,7 @@ async def list_tasks(user_id: int, active_only: bool = True) -> list[dict]:
         query += " AND is_active = 1"
     query += " ORDER BY created_at DESC"
 
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(query, params) as cursor:
             rows = await cursor.fetchall()
             result = []
@@ -79,7 +79,7 @@ async def list_tasks(user_id: int, active_only: bool = True) -> list[dict]:
 
 async def update_task_run(task_id: str, next_run_at: str | None = None) -> None:
     now = utcnow().isoformat()
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             """
             UPDATE tasks
@@ -92,7 +92,7 @@ async def update_task_run(task_id: str, next_run_at: str | None = None) -> None:
 
 
 async def deactivate_task(task_id: str) -> None:
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             "UPDATE tasks SET is_active = 0 WHERE id = ?", (task_id,)
         )
@@ -100,7 +100,7 @@ async def deactivate_task(task_id: str) -> None:
 
 
 async def delete_task(task_id: str, user_id: int) -> bool:
-    async with await get_db() as db:
+    async with get_db() as db:
         cursor = await db.execute(
             "DELETE FROM tasks WHERE id = ? AND user_id = ?",
             (task_id, user_id),

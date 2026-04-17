@@ -96,6 +96,8 @@ warn_return_any = false
 # ── Pytest ────────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+asyncio_default_test_loop_scope = "function"
 testpaths = ["tests"]
 addopts = "-v --tb=short --cov=src/tgai_agent --cov-report=term-missing --cov-report=xml"
 

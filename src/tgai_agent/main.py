@@ -24,6 +24,7 @@ log = get_logger(__name__)
 
 
 async def main() -> None:
+    configure_logging(settings.log_level)
     # ── 1. Database ──────────────────────────────────────────────────────
     from tgai_agent.storage.database import init_db
     await init_db()

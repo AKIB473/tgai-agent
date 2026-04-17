@@ -55,7 +55,7 @@ class SubAgent:
         self.state = AgentState.IDLE
 
         # Use chat_id = -1 as a namespace for this agent's personal memory
-        self._memory = ShortTermMemory(user_id, chat_id=-int(agent_id[:8], 16) % (2**31))
+        self._memory = ShortTermMemory(user_id, chat_id=-int(agent_id.replace("-", "")[:8], 16) % (2**31))
         self._task: asyncio.Task | None = None
 
     async def think(self, user_message: str) -> str:

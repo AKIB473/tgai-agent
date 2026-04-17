@@ -41,10 +41,10 @@ class PluginRegistry:
     @classmethod
     def autodiscover(cls) -> None:
         """Import all modules in plugins/builtin/ to trigger registration."""
-        import plugins.builtin as builtin_pkg
+        import tgai_agent.plugins.builtin as builtin_pkg
 
         for _, module_name, _ in pkgutil.iter_modules(builtin_pkg.__path__):
-            full_name = f"plugins.builtin.{module_name}"
+            full_name = f"tgai_agent.plugins.builtin.{module_name}"
             try:
                 importlib.import_module(full_name)
                 log.debug("plugin.autodiscovered", module=full_name)
@@ -112,7 +112,7 @@ async def _log_execution(
     import json
     now = utcnow().isoformat()
     try:
-        async with await get_db() as db:
+        async with get_db() as db:
             await db.execute(
                 """
                 INSERT INTO plugin_logs

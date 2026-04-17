@@ -1,42 +1,35 @@
 """
-tests/conftest.py — Shared pytest fixtures.
+Root conftest.py — sets up test environment variables before any imports.
 """
-
-from __future__ import annotations
-
 import os
-import pytest
-import pytest_asyncio
-import aiosqlite
+from cryptography.fernet import Fernet
 
-# Force test environment before any imports
-os.environ.setdefault("BOT_TOKEN", "1234567890:test_token_for_pytest_only")
+# Must be set BEFORE any tgai_agent imports happen
+os.environ.setdefault("BOT_TOKEN", "1234567890:AABBCCDDEEFFaabbccddeeff-1234567890AB")
 os.environ.setdefault("API_ID", "12345678")
-os.environ.setdefault("API_HASH", "testhashvalue")
-os.environ.setdefault("ENCRYPTION_KEY", "dGVzdGtleXRlc3RrZXl0ZXN0a2V5dGVzdGtleXQ=")
-os.environ.setdefault("ADMIN_IDS", "999999")
-os.environ.setdefault("DB_PATH", ":memory:")
-os.environ.setdefault("LOG_LEVEL", "WARNING")
+os.environ.setdefault("API_HASH", "abcdef1234567890abcdef1234567890")
+os.environ.setdefault("ADMIN_IDS", "123456789")
+os.environ.setdefault("ENCRYPTION_KEY", Fernet.generate_key().decode())
+
+import pytest
 
 
-@pytest_asyncio.fixture
-async def db():
-    """In-memory SQLite database with schema applied."""
-    from tgai_agent.storage.database import SCHEMA_SQL
-    conn = await aiosqlite.connect(":memory:")
-    conn.row_factory = aiosqlite.Row
-    await conn.execute("PRAGMA foreign_keys=ON")
-    await conn.executescript(SCHEMA_SQL)
-    await conn.commit()
-    yield conn
-    await conn.close()
+@pytest.fixture(scope="session")
+def test_encryption_key():
+    return os.environ["ENCRYPTION_KEY"]
 
 
-@pytest.fixture
-def sample_user_id() -> int:
-    return 123456789
-
-
-@pytest.fixture
-def sample_chat_id() -> int:
-    return -100123456789
+@pytest.fixture(autouse=True)
+def reset_settings_cache():
+    """
+    Reset the settings lru_cache before each test so monkeypatched
+    env vars (e.g. DB_PATH) are picked up by new Settings instances.
+    Also update the module-level `settings` alias used by repositories.
+    """
+    yield
+    # Clean up after test
+    try:
+        from tgai_agent.config import get_settings
+        get_settings.cache_clear()
+    except Exception:
+        pass

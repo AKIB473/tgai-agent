@@ -21,7 +21,9 @@ from tgai_agent.bot_interface.commands.config_cmd import (
 )
 from tgai_agent.bot_interface.menus.keyboards import (
     agents_menu,
+    agent_action_menu,
     config_menu,
+    confirm_menu,
     main_menu,
     provider_menu,
     tasks_menu,
@@ -80,6 +82,32 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     elif data == "menu:status":
         await _handle_status(query, context)
+
+    elif data == "menu:memory":
+        chat_id = query.message.chat_id
+        from tgai_agent.ai_core.memory.short_term import ShortTermMemory
+        memory = ShortTermMemory(user.id, chat_id)
+        summary = await memory.summary()
+        await query.edit_message_text(
+            f"🧠 *Memory*\n\n{summary}\n\nUse /memory clear to wipe.",
+            parse_mode="Markdown",
+            reply_markup=main_menu(),
+        )
+
+    elif data == "menu:plugins":
+        from tgai_agent.plugins.registry import PluginRegistry
+        plugins_list = PluginRegistry.list_all()
+        lines = ["🔌 *Available Plugins:*\n"]
+        for p in plugins_list:
+            safe_marker = "✅" if p.is_safe else "🔒"
+            confirm_marker = " ⚠️" if p.requires_confirmation else ""
+            lines.append(f"{safe_marker} `{p.name}` — {p.description}{confirm_marker}")
+        text = "\n".join(lines) if len(lines) > 1 else "No plugins loaded."
+        await query.edit_message_text(
+            text,
+            parse_mode="Markdown",
+            reply_markup=main_menu(),
+        )
 
     # ── Config actions ───────────────────────────────────────────────────
     elif data == "config:set_key":
@@ -151,6 +179,27 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif data == "agent:new":
         await handle_new_agent(update, context)
 
+    elif data.startswith("agent:view:"):
+        agent_id = data.split(":")[2]
+        from tgai_agent.storage.repositories.agent_repo import get_agent
+        agent_data = await get_agent(agent_id)
+        if not agent_data or agent_data["user_id"] != user.id:
+            await query.edit_message_text("❌ Agent not found.")
+            return
+        state_icon = "🟢" if agent_data["state"] == "running" else "⚪"
+        text = (
+            f"{state_icon} *{agent_data['name']}*\n\n"
+            f"Role: _{agent_data['role']}_\n"
+            f"Provider: `{agent_data['ai_provider']}` / `{agent_data['ai_model']}`\n"
+            f"State: `{agent_data['state']}`\n"
+            f"Created: {agent_data['created_at'][:10]}\n"
+        )
+        await query.edit_message_text(
+            text,
+            parse_mode="Markdown",
+            reply_markup=agent_action_menu(agent_id),
+        )
+
     elif data.startswith("agent:preset:"):
         preset = data.split(":")[2]
         await handle_agent_preset(update, context, preset)
@@ -172,6 +221,37 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif data.startswith("task:delete:"):
         task_id = data.split(":")[2]
         await handle_task_delete(update, context, task_id)
+
+    elif data == "task:new":
+        await query.edit_message_text(
+            "📋 *New Task*\n\n"
+            "Task creation wizard coming soon.\n\n"
+            "For now, tasks can be created programmatically via the API.",
+            parse_mode="Markdown",
+            reply_markup=main_menu(),
+        )
+
+    elif data.startswith("task:view:"):
+        task_id = data.split(":")[2]
+        from tgai_agent.storage.repositories.task_repo import get_task
+        task_data = await get_task(task_id)
+        if not task_data or task_data["user_id"] != user.id:
+            await query.edit_message_text("❌ Task not found.")
+            return
+        icon = "🟢" if task_data["is_active"] else "⚪"
+        text = (
+            f"{icon} *{task_data['name']}*\n\n"
+            f"Trigger: `{task_data['trigger_type']}` — `{task_data['trigger_value']}`\n"
+            f"Action: `{task_data['action_type']}`\n"
+            f"Runs: {task_data['run_count']}\n"
+            f"Last run: {task_data.get('last_run_at') or 'Never'}\n"
+            f"Description: {task_data.get('description') or '—'}\n"
+        )
+        await query.edit_message_text(
+            text,
+            parse_mode="Markdown",
+            reply_markup=confirm_menu(f"task:delete:{task_id}", "menu:tasks"),
+        )
 
     else:
         log.warning("callback.unhandled", data=data)

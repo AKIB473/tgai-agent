@@ -20,7 +20,7 @@ async def upsert_user(
     is_admin: bool = False,
 ) -> None:
     now = utcnow().isoformat()
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             """
             INSERT INTO users (id, username, first_name, is_admin, created_at, updated_at)
@@ -36,7 +36,7 @@ async def upsert_user(
 
 
 async def get_user(user_id: int) -> Optional[dict]:
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(
             "SELECT * FROM users WHERE id = ?", (user_id,)
         ) as cursor:
@@ -51,7 +51,7 @@ async def is_banned(user_id: int) -> bool:
 
 async def ban_user(user_id: int) -> None:
     now = utcnow().isoformat()
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             "UPDATE users SET is_banned = 1, updated_at = ? WHERE id = ?",
             (now, user_id),
@@ -60,7 +60,7 @@ async def ban_user(user_id: int) -> None:
 
 
 async def list_users(limit: int = 100) -> list[dict]:
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(
             "SELECT * FROM users ORDER BY created_at DESC LIMIT ?", (limit,)
         ) as cursor:

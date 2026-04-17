@@ -25,7 +25,7 @@ async def create_agent(
 ) -> str:
     agent_id = str(uuid.uuid4())
     now = utcnow().isoformat()
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             """
             INSERT INTO agents
@@ -41,7 +41,7 @@ async def create_agent(
 
 
 async def get_agent(agent_id: str) -> Optional[dict]:
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(
             "SELECT * FROM agents WHERE id = ?", (agent_id,)
         ) as cursor:
@@ -54,7 +54,7 @@ async def get_agent(agent_id: str) -> Optional[dict]:
 
 
 async def list_agents(user_id: int) -> list[dict]:
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(
             "SELECT * FROM agents WHERE user_id = ? ORDER BY created_at DESC",
             (user_id,),
@@ -70,7 +70,7 @@ async def list_agents(user_id: int) -> list[dict]:
 
 async def update_agent_state(agent_id: str, state: str) -> None:
     now = utcnow().isoformat()
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             "UPDATE agents SET state = ?, updated_at = ? WHERE id = ?",
             (state, now, agent_id),
@@ -80,7 +80,7 @@ async def update_agent_state(agent_id: str, state: str) -> None:
 
 async def update_agent_memory(agent_id: str, memory: list[dict]) -> None:
     now = utcnow().isoformat()
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             "UPDATE agents SET memory_json = ?, updated_at = ? WHERE id = ?",
             (json.dumps(memory), now, agent_id),
@@ -89,7 +89,7 @@ async def update_agent_memory(agent_id: str, memory: list[dict]) -> None:
 
 
 async def delete_agent(agent_id: str, user_id: int) -> bool:
-    async with await get_db() as db:
+    async with get_db() as db:
         cursor = await db.execute(
             "DELETE FROM agents WHERE id = ? AND user_id = ?",
             (agent_id, user_id),

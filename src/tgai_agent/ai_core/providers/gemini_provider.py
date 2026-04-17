@@ -35,30 +35,33 @@ class GeminiProvider(BaseAIProvider):
         max_tokens: int = 1024,
         **kwargs,
     ) -> str:
-        # Gemini doesn't have a native system role in the history API;
-        # prepend system messages as user turns.
+        import asyncio
+
+        system_parts = [m.content for m in messages if m.role == "system"]
+        user_msgs = [m for m in messages if m.role != "system"]
+
         history = []
-        prompt = ""
+        if system_parts:
+            system_text = "\n\n".join(system_parts)
+            history.append({"role": "user", "parts": [f"[Instructions]\n{system_text}"]})
+            history.append({"role": "model", "parts": ["Understood. I will follow these instructions."]})
 
-        for msg in messages:
-            if msg.role == "system":
-                # Inject system instructions as a leading user message
-                history.append({"role": "user", "parts": [f"[System Instructions]\n{msg.content}"]})
-                history.append({"role": "model", "parts": ["Understood. I'll follow these instructions."]})
-            elif msg.role == "assistant":
-                history.append({"role": "model", "parts": [msg.content]})
-            else:
-                prompt = msg.content  # last user message is the actual prompt
+        for msg in user_msgs[:-1]:
+            role = "model" if msg.role == "assistant" else "user"
+            history.append({"role": role, "parts": [msg.content]})
 
-        # Use chat session for multi-turn history
-        chat = self._model_instance.start_chat(history=history[:-1] if history else [])
-        response = await chat.send_message_async(
-            prompt,
-            generation_config=genai.GenerationConfig(
-                temperature=temperature,
-                max_output_tokens=max_tokens,
-            ),
+        prompt = user_msgs[-1].content if user_msgs else ""
+
+        generation_config = genai.GenerationConfig(
+            temperature=temperature,
+            max_output_tokens=max_tokens,
         )
-        text = response.text or ""
+
+        def _sync_call() -> str:
+            chat = self._model_instance.start_chat(history=history)
+            response = chat.send_message(prompt, generation_config=generation_config)
+            return response.text or ""
+
+        text = await asyncio.to_thread(_sync_call)
         log.debug("gemini.complete", model=self.model, chars=len(text))
         return text

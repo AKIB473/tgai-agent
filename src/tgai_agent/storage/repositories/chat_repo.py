@@ -18,7 +18,7 @@ log = get_logger(__name__)
 async def save_api_key(user_id: int, provider: str, api_key: str) -> None:
     now = utcnow().isoformat()
     encrypted = encrypt(api_key)
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             """
             INSERT INTO api_keys (user_id, provider, key_encrypted, created_at, updated_at)
@@ -34,7 +34,7 @@ async def save_api_key(user_id: int, provider: str, api_key: str) -> None:
 
 async def get_api_key(user_id: int, provider: str) -> str:
     """Return the decrypted API key, or empty string if not set."""
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(
             "SELECT key_encrypted FROM api_keys WHERE user_id = ? AND provider = ?",
             (user_id, provider),
@@ -57,7 +57,7 @@ DEFAULT_CHAT_CONFIG = {
 
 
 async def get_chat_config(user_id: int, chat_id: int) -> dict:
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(
             "SELECT * FROM chat_configs WHERE user_id = ? AND chat_id = ?",
             (user_id, chat_id),
@@ -71,11 +71,9 @@ async def get_chat_config(user_id: int, chat_id: int) -> dict:
 async def upsert_chat_config(user_id: int, chat_id: int, **kwargs) -> None:
     now = utcnow().isoformat()
     existing = await get_chat_config(user_id, chat_id)
-
-    # Merge updates onto existing config
     merged = {**existing, **kwargs, "updated_at": now}
 
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             """
             INSERT INTO chat_configs
@@ -116,7 +114,7 @@ async def append_message(
     token_count: int = 0,
 ) -> None:
     now = utcnow().isoformat()
-    async with await get_db() as db:
+    async with get_db() as db:
         await db.execute(
             """
             INSERT INTO messages (user_id, chat_id, role, content, token_count, created_at)
@@ -133,7 +131,7 @@ async def get_messages(
     limit: int = 50,
 ) -> list[dict]:
     """Return recent messages in chronological order (oldest first)."""
-    async with await get_db() as db:
+    async with get_db() as db:
         async with db.execute(
             """
             SELECT role, content FROM messages
@@ -148,7 +146,7 @@ async def get_messages(
 
 
 async def clear_messages(user_id: int, chat_id: int) -> int:
-    async with await get_db() as db:
+    async with get_db() as db:
         cursor = await db.execute(
             "DELETE FROM messages WHERE user_id = ? AND chat_id = ?",
             (user_id, chat_id),
